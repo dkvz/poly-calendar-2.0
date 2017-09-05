@@ -1,0 +1,6 @@
+===== Project Notes ======
+
+==== TODO ====
+
+  * Test a 1.0 element like the scheduler thingy, see if I can control it from the ES6 code.
+    * Check if it works on mobile and on Firefox.
