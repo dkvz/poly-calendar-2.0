@@ -18,6 +18,7 @@ In this example I got two for the same day.
   * The text is in english, though that may be because my OS is in english as well. I need to check that.
     * Fixed with locale.
   * A scollbar appears in agendaWeek view mode. I already have the document scrollbar, that's too many scrollbars. This is supposed to be fixed on the latest commit (not the latest version), I might be able to apply the "fix" myself.
+    * Fixed by using the last version of the component as a submodule in src.
 
 ==== The language issue ====
 I had to add a script tag in the scheduler-component, this is the beginning of the file, the new line is the "local-all.js" import. You could import just some specific locales or all of them.
