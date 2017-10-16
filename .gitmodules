@@ -1,0 +1,3 @@
+[submodule "src/scheduler-component"]
+	path = src/scheduler-component
+	url = https://github.com/dkvz/scheduler-component.git
