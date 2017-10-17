@@ -20,6 +20,27 @@ In this example I got two for the same day.
   * A scollbar appears in agendaWeek view mode. I already have the document scrollbar, that's too many scrollbars. This is supposed to be fixed on the latest commit (not the latest version), I might be able to apply the "fix" myself.
     * Fixed by using the last version of the component as a submodule in src.
 
+===== The start / end issue =====
+The scheduler-component saves time in a special object type. Thing is I have to give start and end as a String to my other components.
+
+To show it like so:
+2017-10-06T09:00:00
+
+I can use: e.detail.calEvent.start.format() (assuming I'm in a click event related to the scheduler-component).
+
+I'm not sure if it is the classic JS Date object, doesn't look like it is.
+
+I can format manually using start.day, start.hour, etc.
+
+In my custom components I could reference the parsed dates as functions with bindings such as [[startTime()]] that would parse just the time of day as string.
+
+Or, maybe I can use this:
+https://www.polymer-project.org/2.0/docs/devguide/observers#computed-properties
+
+Actually I'm going to do both since with computed properties I still need a function that returns the right String.
+
+UPDATE: The date format is defined somewhere in moment.js. So this might work: moment().format('[The time is] h:mm:ss a');
+
 ==== The language issue ====
 I had to add a script tag in the scheduler-component, this is the beginning of the file, the new line is the "local-all.js" import. You could import just some specific locales or all of them.
 

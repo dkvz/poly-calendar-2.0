@@ -63,6 +63,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <b>Starting at:&nbsp;</b>{{startTime}}
       </p>
       <p>
+        <b>Ending at:&nbsp;</b>{{endTime}}
+      </p>
+      <p>
         <b>Type:&nbsp;</b>{{type}}
       </p>
       <p>
@@ -119,11 +122,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         date: {
           type: String,
+          computed: 'computeDate(start)'
+        },
+        start: {
+          type: Object,
+          notify: true
+        },
+        end: {
+          type: Object,
           notify: true
         },
         startTime: {
           type: String,
-          notify: true
+          computed: 'computeTime(start)'
+        },
+        endTime: {
+          type: String,
+          computed: 'computeTime(end)'
         },
         location: {
           type: String,
@@ -189,6 +204,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       editPersonDetails: function() {
         this.personEditMode = true;
+      },
+      computeDate: function(date) {
+        //return date.day() + '/' + date.month() + '/' + date.year();
+        return date.format('DD/MM/YYYY');
+      },
+      computeTime: function(date) {
+        //return date.hour() + ':' + date.minute();
+        return date.format('hh:mm');
       }
 
     });
