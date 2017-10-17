@@ -1,0 +1,159 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-date-picker-item/paper-date-picker-item.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="person-details">
+
+  <template>
+
+    <style>
+      :host {
+        --paper-input-container: {
+          margin: 0;
+        };
+      }
+      .diag {
+        padding: 4px 24px 4px 24px;
+        margin: 0;
+      }
+      h2 {
+        margin-bottom: 0;
+      }
+      paper-date-picker-item {
+        margin-top: 10px;
+      }
+    </style>
+
+    <style is="custom-style" include="shared-styles"></style>
+    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+
+    <div class="layout vertical diag">
+      <h2>Détails</h2>
+      <template is="dom-if" if="{warningMessage}}">
+        <div class="warning">{{warningMessage}}</div>
+      </template>
+      <template is="dom-if" if="{{editMode}}">
+        <paper-input label="Nom" value="{{lastName}}"></paper-input>
+        <paper-input label="Prénom" value="{{firstName}}"></paper-input>
+        <paper-date-picker-item icon="icons:today" date="{{birthdate}}" date-format="ll" placeholder="Date de naissance">
+        </paper-date-picker-item>
+        <paper-input label="Tél. Mobile" value="{{phoneMobile}}"></paper-input>
+        <paper-input label="Tél. Domicile" value="{{phoneHome}}"></paper-input>
+        <paper-input label="Tél. Bureau" value="{{phoneWork}}"></paper-input>
+        <paper-input label="Email" value="{{email}}"></paper-input>
+        <paper-dropdown-menu label="Langue">
+          <paper-listbox class="dropdown-content" selected="0">
+            <paper-item>Français</paper-item>
+            <paper-item>Néerlandais</paper-item>
+            <paper-item>Anglais</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <template is="dom-if" if="{{editControls}}">
+          <div class="layout horizontal end-justified">
+            <paper-icon-button icon="save" title="Save" on-tap="save"></paper-icon-button>
+            <paper-icon-button icon="cancel" title="Cancel" on-tap="cancel"></paper-icon-button>
+          </div>
+        </template>
+      </template>
+      <template is="dom-if" if="{{!editMode}}">
+        <p>
+          <b>Nom:&nbsp;</b>{{lastName}}
+        </p>
+        <p>
+          <b>Prénom:&nbsp;</b>{{firstName}}
+        </p>
+        <p>
+          <b>Date de naissance:&nbsp;</b>{{birthday}}
+        </p>
+        <p>
+          <b>Tél. Mobile:&nbsp;</b>{{phoneMobile}}
+        </p>
+        <p>
+          <b>Tél. Domicile:&nbsp;</b>{{phoneHome}}
+        </p>
+        <p>
+          <b>Tél. Bureau:&nbsp;</b>{{phoneWork}}
+        </p>
+        <p>
+          <b>Email:&nbsp;</b>{{email}}
+        </p>
+        <p>
+          <b>Langue:&nbsp;</b>{{language}}
+        </p>
+      </template>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'person-details',
+
+      properties: {
+
+        editMode: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+        editControls: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+        warningMessage: {
+          type: String,
+          notify: true,
+          value: ''
+        },
+        lastName: {
+          type: String,
+          notify: true
+        },
+        firstName: {
+          type: String,
+          notify: true
+        },
+        birthdate: {
+          type: Date,
+          notify: true
+        },
+        language: {
+          type: String,
+          notify: true
+        }
+
+      },
+      save: function() {
+        console.log('Saving the details about this person.');
+      },
+      cancel: function() {
+
+      },
+      attached: function() {
+
+      }
+
+    });
+
+  </script>
+
+</dom-module>

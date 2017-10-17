@@ -1,0 +1,198 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animations.html">
+<link rel="import" href="appointment-edit-dialog.html">
+<link rel="import" href="person-details.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="calendar-appointment">
+
+  <template>
+
+    <style>
+      #appoint {
+        border: var(--appointment-border-bottom, 4px solid silver);
+        margin: 0;
+        padding: 6px;
+        margin-top: -4px;
+      }
+      .location {
+        text-align: right;
+        font-weight: bolder
+      }
+      .dialog {
+        overflow: auto;
+      }
+      /*paper-fab {
+        position: absolute;
+        right: 6px;
+        bottom: 6px;
+      }*/
+    </style>
+
+    <style is="custom-style" include="shared-styles"></style>
+    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+
+    <!-- The with-backdrop option makes the background darker when dialog is shown, not sure if it makes it modal -->
+    <paper-dialog class="dialog" id="details" no-overlap entry-animation="scale-up-animation" exit-animation="fade-out-animation">
+      <div class="layout horizontal center">
+        <h2 class="flex">Détails</h2>
+        <paper-icon-button icon="cancel" title="Close" on-tap="close"></paper-icon-button>
+      </div>
+      <p>
+        <b>Name:&nbsp;</b>
+        <a id="detailsLink" on-tap="showPersonDetails" href="">{{displayedName}}</a>
+      </p>
+      <p>
+        <b>Date:&nbsp;</b>{{date}}
+      </p>
+      <p>
+        <b>Starting at:&nbsp;</b>{{startTime}}
+      </p>
+      <p>
+        <b>Type:&nbsp;</b>{{type}}
+      </p>
+      <p>
+        <template is="dom-if" if="{{location}}">
+          <b>Localisation:&nbsp;</b>{{location}}
+        </template>
+        <div>
+          <paper-fab icon="image:edit" on-tap="edit"></paper-fab>
+        </div>
+      </p>
+    </paper-dialog>
+    <paper-dialog class="dialog" id="personDetails">
+      <person-details id="personDetailsEl" edit-mode="{{personEditMode}}" first-name="Test name" last-name="Test last name"></person-details>
+      <template is="dom-if" if="{{personEditMode}}">
+        <div class="layout horizontal end-justified" style="margin-top: 0">
+          <paper-icon-button icon="save" title="Save" on-tap="savePersonDetails"></paper-icon-button>
+          <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
+        </div>
+      </template>
+      <template is="dom-if" if="{{!personEditMode}}">
+        <div class="layout horizontal end-justified" style="margin-top: 0">
+          <paper-icon-button icon="image:edit" title="Edit" on-tap="editPersonDetails"></paper-icon-button>
+          <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
+        </div>
+      </template>
+    </paper-dialog>
+    <appointment-edit-dialog
+      id="editDialog" date="{{date}}"
+      displayed-name="{{displayedName}}"
+      location="{{location}}" blocs="{{blocs}}"
+      start-time="{{startTime}}"
+      data="{{data}}"
+      modified="{{modified}}"
+      color="{{color}}"
+      type="{{type}}"
+      appointment-types="{{appointmentTypes}}"
+      reminder-email="{{reminderEmail}}"
+      reminder-sms="{{reminderSms}}">
+    </appointment-edit-dialog>
+
+  </template>
+
+    <script>
+
+    Polymer({
+
+      is: 'calendar-appointment',
+
+      properties: {
+
+        displayedName: {
+          type: String,
+          notify: true
+        },
+        date: {
+          type: String,
+          notify: true
+        },
+        startTime: {
+          type: String,
+          notify: true
+        },
+        location: {
+          type: String,
+          notify: true
+        },
+        type: {
+          type: String,
+          notify: true
+        },
+        data: {
+          type: Array,
+          notify: true
+        },
+        modified: {
+          type: Boolean,
+          notify: true
+        },
+        appointmentTypes: {
+          type: Array,
+          notify: true
+        },
+        reminderEmail: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+        reminderSms: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+        personEditMode: {
+          type: Boolean,
+          notify: true,
+          value: false
+        }
+
+      },
+      attached: function() {
+
+      },
+      showDetails: function() {
+        //this.$.details.positionTarget = this.$.appoint;
+        this.$.details.open();
+      },
+      edit: function() {
+        this.$.details.close();
+        this.$.editDialog.open();
+      },
+      close: function() {
+        this.$.details.close();
+      },
+      showPersonDetails: function() {
+        //this.$.personDetails.positionTarget = this.$.detailsLink;
+        this.$.personDetails.toggle();
+      },
+      savePersonDetails: function() {
+        this.$.personDetailsEl.save();
+      },
+      cancelPersonDetails: function() {
+        this.$.personDetails.close();
+        this.personEditMode = false;
+      },
+      editPersonDetails: function() {
+        this.personEditMode = true;
+      }
+
+    });
+
+  </script>
+
+</dom-module>

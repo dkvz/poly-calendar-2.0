@@ -1,0 +1,277 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="person-details.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="appointment-edit-dialog">
+
+  <template>
+
+    <style>
+      .small {
+        font-size: 0.82em;
+      }
+    </style>
+
+    <style is="custom-style" include="shared-styles"></style>
+    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+
+    <!--<paper-dialog id="editDialog" no-cancel-on-outside-click no-cancel-on-esc-key always-on-top>-->
+    <paper-dialog id="editDialog" modal always-on-top on-iron-overlay-opened="patchOverlay">
+      <div class="layout vertical">
+        <h2>Editer le rendez-vous</h2>
+        <template is="dom-if" if="{warningMessage}}">
+          <div class="warning">{{warningMessage}}</div>
+        </template>
+        <paper-input label="Nom" id="inputName" value="{{displayedName}}"></paper-input>
+        <div class="small">
+          <a href="#" on-tap="showEditPerson">Enregistrer cette personne...</a>
+        </div>
+        <paper-input label="Localisation" id="inputLocation" value="{{location}}"></paper-input>
+        <paper-dropdown-menu label="Type de rendez-vous" id="appointmentType">
+          <paper-listbox class="dropdown-content" selected="{{typeSelectedId}}" id="typeList">
+            <!-- The paper-item should be colored according to the appointment type color -->
+            <!-- OK I kinda did and it doesn't look that great...
+            <paper-item>Normal</paper-item>
+            <paper-item style="background-color: red">Privé</paper-item> -->
+            <template is="dom-repeat" items="{{appointmentTypes}}">
+              <paper-item style="background-color: {{item.color}}">{{item.type}}</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <br />
+        <div>
+          Nombre de blocs (par demi-heure): <b>{{blocs}}</b>&nbsp;
+        </div>
+        <div class="layout horizontal end-justified">
+          <paper-icon-button icon="add-box" title="Add" on-tap="addBloc"></paper-icon-button>
+          <paper-icon-button icon="indeterminate-check-box" title="Remove" on-tap="removeBloc"></paper-icon-button>
+        </div>
+        <br />
+        <div>Rappel:</div>
+        <div class="layout horizontal around-justified">
+          <paper-checkbox checked="{{reminderEmail}}">Par Email</paper-checkbox>
+          <paper-checkbox checked="{{reminderSms}}">Par SMS</paper-checkbox>
+        </div>
+
+        <hr width="100%" />
+        <div class="layout horizontal end-justified">
+          <!-- I need a delete button if a displayedName exists -->
+          <!-- TODO Translations in title arguments here -->
+          <paper-icon-button icon="save" title="Save" on-tap="save"></paper-icon-button>
+          <paper-icon-button icon="delete" title="Delete" on-tap="remove"></paper-icon-button>
+          <paper-icon-button icon="cancel" title="Cancel" on-tap="cancel"></paper-icon-button>
+        </div>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="personDetails" modal always-on-top>
+      <person-details id="personDetailsEl" edit-mode first-name="Test name" last-name="Test last name"></person-details>
+      <div class="layout horizontal end-justified" style="margin-top: 0">
+        <paper-icon-button icon="save" title="Save" on-tap="savePersonDetails"></paper-icon-button>
+        <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+
+    <script>
+
+    Polymer({
+
+      is: 'appointment-edit-dialog',
+
+      properties: {
+
+        displayedName: {
+          type: String,
+          notify: true
+        },
+        date: {
+          type: String,
+          notify: true
+        },
+        startTime: {
+          type: String,
+          notify: true
+        },
+        location: {
+          type: String,
+          notify: true
+        },
+        originalData: {
+          type: Object,
+          notify: false
+        },
+        type: {
+          type: String,
+          notify: true
+        },
+        blocs: {
+          type: Number,
+          notify: true,
+          value: 1
+        },
+        /**
+          In my testing this is passed by reference. I hope it is on every browser.
+        **/
+        data: {
+          type: Array,
+          notify: true
+        },
+        /**
+          Maximum endTime we can have.
+        **/
+        maxEndTime: {
+          type: String,
+          notify: true,
+          value: '23:00'
+        },
+        modified: {
+          type: Boolean,
+          notify: true
+        },
+        warningMessage: {
+          type: String,
+          notify: true,
+          value: ''
+        },
+        color: {
+          type: String,
+          notify: true,
+          value: 'white'
+        },
+        typeSelectedId: {
+          type: Number,
+          notify: true,
+          value: 0
+        },
+        appointmentTypes: {
+          type: Array,
+          notify: true,
+          value: []
+        },
+        reminderEmail: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+        reminderSms: {
+          type: Boolean,
+          notify: true,
+          value: false
+        }
+
+      },
+      save: function() {
+        console.log('Hit save');
+
+        this.saveOriginalData();
+        this.close();
+        this.modified = true;
+      },
+      attached: function() {
+        this.saveOriginalData();
+        this._setDropdownPosition();
+      },
+      _setDropdownPosition: function() {
+        for (var i = 0; i < this.appointmentTypes.length; i++) {
+          if (this.appointmentTypes[i].type === this.type) {
+            this.typeSelectedId = i;
+            break;
+          }
+        }
+      },
+      _saveType: function() {
+        var index = this.$.typeList.selected;
+        this.type = this.appointmentTypes[index].type;
+        this.color = this.appointmentTypes[index].color;
+      },
+      saveOriginalData: function() {
+        this.originalData = {
+          location: this.location,
+          displayedName: this.displayedName,
+          blocs: this.blocs,
+          type: this.type
+        };
+      },
+      remove: function() {
+
+        this.close();
+        // Trigger the listener for modified on the parent components:
+        this.modified = modify;
+      },
+      open: function() {
+        this.$.editDialog.open();
+      },
+      cancel: function() {
+        this.displayedName = this.originalData.displayedName;
+        this.blocs = this.originalData.blocs;
+        this.location = this.originalData.location;
+        this.type = this.originalData.type;
+        this.close();
+      },
+      close: function() {
+        this.$.editDialog.close();
+      },
+      patchOverlay: function (e) {
+        if (e.target.withBackdrop) {
+          e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
+        }
+      },
+      addBloc: function() {
+       this.blocs++;
+       this.warningMessage = '';
+      },
+      removeBloc: function() {
+        if (this.blocs > 1) {
+          this.blocs--;
+          this.warningMessage = '';
+        }
+      },
+      _getTimeRepresentation: function(time) {
+        var mins = '00';
+        if ((time % 1) != 0) {
+          mins = '30';
+        }
+        return Math.floor(time).toString() + ':' + mins;
+      },
+      _clearBloc: function() {
+        this.blocs = 1;
+        this.displayedName = '';
+        this.id = 0;
+        this.color = 'white';
+      },
+      showEditPerson: function() {
+        this.$.personDetails.toggle();
+      },
+      cancelPersonDetails: function() {
+        this.$.personDetails.close();
+      },
+      savePersonDetails: function() {
+        this.$.personDetailsEl.save();
+      }
+
+    });
+
+  </script>
+
+</dom-module>
