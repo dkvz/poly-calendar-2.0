@@ -46,18 +46,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <a href="#" on-tap="showEditPerson">Enregistrer cette personne...</a>
         </div>
         <paper-input label="Localisation" id="inputLocation" value="{{location}}"></paper-input>
+        <!--
         <paper-dropdown-menu label="Type de rendez-vous" id="appointmentType">
           <paper-listbox class="dropdown-content" selected="{{typeSelectedId}}" id="typeList">
-            <!-- The paper-item should be colored according to the appointment type color -->
-            <!-- OK I kinda did and it doesn't look that great...
-            <paper-item>Normal</paper-item>
-            <paper-item style="background-color: red">Privé</paper-item> -->
             <template is="dom-repeat" items="{{appointmentTypes}}">
               <paper-item style="background-color: {{item.color}}">{{item.type}}</paper-item>
             </template>
           </paper-listbox>
         </paper-dropdown-menu>
-        <br />
+        -->
+
+        <!--
         <div>
           Nombre de blocs (par demi-heure): <b>{{blocs}}</b>&nbsp;
         </div>
@@ -65,6 +64,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-icon-button icon="add-box" title="Add" on-tap="addBloc"></paper-icon-button>
           <paper-icon-button icon="indeterminate-check-box" title="Remove" on-tap="removeBloc"></paper-icon-button>
         </div>
+        -->
+
+        <div class="horizontal center layout">
+          <div class="flex">Heure début:</div><paper-input no-label-float maxlength="2" size="2" id="inputStartTimeH" value="{{startTimeH}}"></paper-input>
+          <div>:</div>
+          <paper-input maxlength="2" id="inputStartTimeM" no-label-float size="2" value="{{startTimeM}}"></paper-input>
+        </div>
+        <div class="horizontal center layout">
+          <div class="flex">Heure fin:</div><paper-input no-label-float maxlength="2" size="2" id="inputEndTimeH" value="{{endTimeH}}"></paper-input>
+          <div>:</div>
+          <paper-input maxlength="2" id="inputEndTimeM" no-label-float size="2" value="{{endTimeM}}"></paper-input>
+        </div>
+
         <br />
         <div>Rappel:</div>
         <div class="layout horizontal around-justified">
@@ -130,11 +142,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           notify: true,
           value: 1
         },
-        /**
-          In my testing this is passed by reference. I hope it is on every browser.
-        **/
-        data: {
-          type: Array,
+        startTimeM: {
+          type: String,
+          notify: true
+        },
+        startTimeH: {
+          type: String,
+          notify: true
+        },
+        endTimeM: {
+          type: String,
+          notify: true
+        },
+        endTimeH: {
+          type: String,
           notify: true
         },
         /**
@@ -190,7 +211,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       attached: function() {
         this.saveOriginalData();
-        this._setDropdownPosition();
+        // Temporarily deactivating the appointment types
+        //this._setDropdownPosition();
       },
       _setDropdownPosition: function() {
         for (var i = 0; i < this.appointmentTypes.length; i++) {
@@ -209,7 +231,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.originalData = {
           location: this.location,
           displayedName: this.displayedName,
-          blocs: this.blocs,
           type: this.type
         };
       },
@@ -224,7 +245,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       cancel: function() {
         this.displayedName = this.originalData.displayedName;
-        this.blocs = this.originalData.blocs;
+
         this.location = this.originalData.location;
         this.type = this.originalData.type;
         this.close();
@@ -237,16 +258,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
         }
       },
-      addBloc: function() {
-       this.blocs++;
-       this.warningMessage = '';
-      },
-      removeBloc: function() {
-        if (this.blocs > 1) {
-          this.blocs--;
-          this.warningMessage = '';
-        }
-      },
       _getTimeRepresentation: function(time) {
         var mins = '00';
         if ((time % 1) != 0) {
@@ -255,7 +266,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return Math.floor(time).toString() + ':' + mins;
       },
       _clearBloc: function() {
-        this.blocs = 1;
         this.displayedName = '';
         this.id = 0;
         this.color = 'white';

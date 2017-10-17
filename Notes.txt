@@ -41,6 +41,22 @@ Actually I'm going to do both since with computed properties I still need a func
 
 UPDATE: The date format is defined somewhere in moment.js. So this might work: moment().format('[The time is] h:mm:ss a');
 
+==== Data to put in events ====
+  * start
+  * end
+  * displayedName
+  * title (= displayedName, c'est pour utiliser avec le scheduler-component - on pourrait ajouter le type un jour, peut-être)
+  * personId
+  * location
+  * reminderEmail
+  * reminderSms
+  * [appointmentTypeId] <- Let's not use this for the moment.
+
+Le JSON peut simplement avoir une collection "events". A noter qu'au niveau du scheduler-component, displayedName = title.
+
+==== Calender resizing ====
+I need to detect the display size to react to it by displaying only one day on mobile.
+
 ==== The language issue ====
 I had to add a script tag in the scheduler-component, this is the beginning of the file, the new line is the "local-all.js" import. You could import just some specific locales or all of them.
 
