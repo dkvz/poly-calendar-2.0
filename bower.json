@@ -27,7 +27,10 @@
     "paper-item": "^2.0.0",
     "paper-date-picker-item": "^1.7.0",
     "paper-listbox": "^2.0.0",
-    "iron-meta": "^2.0.2"
+    "iron-meta": "^2.0.2",
+    "paper-spinner": "^2.0.0",
+    "iron-ajax": "^2.0.5",
+    "paper-material": "^2.0.0"
   },
   "resolutions": {
     "polymer": "^2.0.0",

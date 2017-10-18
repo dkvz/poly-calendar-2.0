@@ -98,7 +98,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             fallback-selection="view404"
             role="main">
 
-          <calendar-view name="calendar-view"></calendar-view>
+          <calendar-view name="calendar-view" id="calView"></calendar-view>
+          <login-view name="login-view" id="loginView"
+            page="{{page}}"
+            page-to-redirect-to="calendar-view"
+            authenticated="{{authenticated}}"
+            creds="{{creds}}">
+          </login-view>
           <!--<my-view2 name="view2"></my-view2>
           <my-view3 name="view3"></my-view3>-->
           <view404 name="view404"></view404>
@@ -123,6 +129,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
           rootPath: String,
+          authenticated: {
+            type: Boolean,
+            value: false,
+            notify: true
+          },
+          creds: {
+            type: Object,
+            notify: true,
+            value: {user: '', token: ''}
+          }
         };
       }
 
@@ -135,7 +151,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _routePageChanged(page) {
         // If no page was found in the route data, page will be an empty string.
         // Deault to 'view1' in that case.
-        this.page = page || 'calendar-view';
+        //this.page = page || 'calendar-view';
+        if (!this.authenticated) {
+          this.page = 'login-view';
+        } else {
+          this.page = page || 'calendar-view';
+        }
 
         // Close a non-persistent drawer when the page & route are changed.
         if (!this.$.drawer.persistent) {
