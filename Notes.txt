@@ -10,15 +10,23 @@ events='[
 In this example I got two for the same day.
 
 ===== Problems with the calendar =====
-  * Uses "9p" for 9PM, I need another format.
-    * Fixed with locale.
-  * Doesn't show the end time for events. Though I'm not certain I actually need it.
-    * Solved. I need the "week view."
-  * Error in console: Uncaught TypeError: Cannot read property 'addEventListener' of null at setTimeout (scheduler-component.html:262)
-  * The text is in english, though that may be because my OS is in english as well. I need to check that.
-    * Fixed with locale.
-  * A scollbar appears in agendaWeek view mode. I already have the document scrollbar, that's too many scrollbars. This is supposed to be fixed on the latest commit (not the latest version), I might be able to apply the "fix" myself.
-    * Fixed by using the last version of the component as a submodule in src.
+
+  * The time is not in 24h format when parsing it in the calendar-appointment details view.
+  * Does the calendar allow having two events at the same time? How is that displayed? We should be able to select the individual event.
+
+==== Fixed  ====
+* Uses "9p" for 9PM, I need another format.
+  * Fixed with locale.
+* Doesn't show the end time for events. Though I'm not certain I actually need it.
+  * Solved. I need the "week view."
+* Error in console: Uncaught TypeError: Cannot read property 'addEventListener' of null at setTimeout (scheduler-component.html:262)
+  * Seems to have vanished with update.
+* The text is in english, though that may be because my OS is in english as well. I need to check that.
+  * Fixed with locale.
+* A scollbar appears in agendaWeek view mode. I already have the document scrollbar, that's too many scrollbars. This is supposed to be fixed on the latest commit (not the latest version), I might be able to apply the "fix" myself.
+  * Fixed by using the last version of the component as a submodule in src.
+* We need to intercept when the displayed date range changes.
+  * This should be it: date-range-changed
 
 ===== The start / end issue =====
 The scheduler-component saves time in a special object type. Thing is I have to give start and end as a String to my other components.
@@ -73,3 +81,9 @@ I had to add a script tag in the scheduler-component, this is the beginning of t
   * Test a 1.0 element like the scheduler thingy, see if I can control it from the ES6 code.
     * Check if it works on mobile and on Firefox.
   * Add to README or something that scheduler-component has to be edited or import that component in another way (probably putting it in src).
+  * Add a control to change the calendar view.
+  * Catch escape key presses on dialogs to close them.
+  * Clicking outside a non-edit dialog to close it?
+  * Add a refresh button somewhere to reload the current range of events.
+  * Add a spinner when loading events.
+  * Fix all the warnings issues by "polymer lint".

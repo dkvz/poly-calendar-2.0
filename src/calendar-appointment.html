@@ -97,17 +97,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </paper-dialog>
     <appointment-edit-dialog
-      id="editDialog" date="{{date}}"
+      id="editDialog"
+      date="[[date]]"
       displayed-name="{{displayedName}}"
-      location="{{location}}" blocs="{{blocs}}"
-      start-time="{{startTime}}"
+      location="{{location}}"
+      start="{{start}}"
+      end="{{end}}"
       data="{{data}}"
       modified="{{modified}}"
       color="{{color}}"
       type="{{type}}"
       appointment-types="{{appointmentTypes}}"
       reminder-email="{{reminderEmail}}"
-      reminder-sms="{{reminderSms}}">
+      reminder-sms="{{reminderSms}}"
+      new-appointment="{{newAppointment}}">
     </appointment-edit-dialog>
 
   </template>
@@ -182,6 +185,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Boolean,
           notify: true,
           value: false
+        },
+        newAppointment: {
+          type: Boolean,
+          notify: true,
+          value: false
         }
 
       },
@@ -219,7 +227,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       computeTime: function(date) {
         //return date.hour() + ':' + date.minute();
-        return date.format('hh:mm');
+        return date.format('HH:mm');
+      },
+      clear: function() {
+        this.data = [];
+        this.modified = false;
+        this.newAppointment = false;
+        this.personId = 0;
+        this.displayedName = '';
       }
 
     });

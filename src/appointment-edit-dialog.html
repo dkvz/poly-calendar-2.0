@@ -43,7 +43,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-dialog id="editDialog" modal always-on-top on-iron-overlay-opened="patchOverlay">
       <div class="layout vertical">
         <h2>Editer le rendez-vous</h2>
-        <template is="dom-if" if="{warningMessage}}">
+        <template is="dom-if" if="{{warningMessage}}">
           <div class="warning">{{warningMessage}}</div>
         </template>
         <paper-input label="Nom" id="inputName" value="{{displayedName}}"></paper-input>
@@ -70,7 +70,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-icon-button icon="indeterminate-check-box" title="Remove" on-tap="removeBloc"></paper-icon-button>
         </div>
         -->
-
         <div class="horizontal center layout">
           <div class="flex">Heure début:</div><paper-input no-label-float maxlength="2" size="2" id="inputStartTimeH" value="{{startTimeH}}"></paper-input>
           <div>:</div>
@@ -92,7 +91,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <hr width="100%" />
         <div class="layout horizontal end-justified">
           <!-- I need a delete button if a displayedName exists -->
-          <!-- TODO Translations in title arguments here -->
           <paper-icon-button icon="save" title="Save" on-tap="save"></paper-icon-button>
           <paper-icon-button icon="delete" title="Delete" on-tap="remove"></paper-icon-button>
           <paper-icon-button icon="cancel" title="Cancel" on-tap="cancel"></paper-icon-button>
@@ -126,8 +124,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: String,
           notify: true
         },
-        startTime: {
-          type: String,
+        start: {
+          type: Object,
+          notify: true
+        },
+        end: {
+          type: Object,
           notify: true
         },
         location: {
@@ -148,27 +150,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           value: 1
         },
         startTimeM: {
-          type: String,
-          notify: true
+          type: String
         },
         startTimeH: {
-          type: String,
-          notify: true
+          type: String
         },
         endTimeM: {
-          type: String,
-          notify: true
+          type: String
         },
         endTimeH: {
-          type: String,
-          notify: true
+          type: String
         },
         /**
           Maximum endTime we can have.
         **/
         maxEndTime: {
           type: String,
-          notify: true,
           value: '23:00'
         },
         modified: {
@@ -177,7 +174,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         warningMessage: {
           type: String,
-          notify: true,
           value: ''
         },
         color: {
@@ -204,6 +200,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Boolean,
           notify: true,
           value: false
+        },
+        newAppointment: {
+          type: Boolean,
+          notify: true,
+          value: false
         }
 
       },
@@ -215,9 +216,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.modified = true;
       },
       attached: function() {
-        this.saveOriginalData();
-        // Temporarily deactivating the appointment types
-        //this._setDropdownPosition();
+        // This is only called once.
       },
       _setDropdownPosition: function() {
         for (var i = 0; i < this.appointmentTypes.length; i++) {
@@ -246,6 +245,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.modified = modify;
       },
       open: function() {
+        this.saveOriginalData();
+        // Initialize the time and stuff:
+        this._initForm();
         this.$.editDialog.open();
       },
       cancel: function() {
@@ -263,17 +265,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
         }
       },
-      _getTimeRepresentation: function(time) {
-        var mins = '00';
-        if ((time % 1) != 0) {
-          mins = '30';
-        }
-        return Math.floor(time).toString() + ':' + mins;
-      },
       _clearBloc: function() {
         this.displayedName = '';
         this.id = 0;
         this.color = 'white';
+      },
+      _initForm: function() {
+        this.startTimeH = this.start.format('HH');
+        this.startTimeM = this.start.format('mm');
+        this.endTimeH = this.end.format('HH');
+        this.endTimeM = this.end.format('mm');
       },
       showEditPerson: function() {
         this.$.personDetails.toggle();
