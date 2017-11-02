@@ -3,12 +3,17 @@
   "shell": "src/my-app.html",
   "fragments": [
     "src/calendar-view.html",
-    "src/my-view404.html"
+    "src/login-view.html",
+    "src/view404.html"
   ],
   "sources": [
-    "src/**/*",
+    "src/*.html",
+    "src/scheduler-component/scheduler-component.html",
+    "src/scheduler-component/categories-element.html",
+    "src/scheduler-component/category-element.html",
     "images/**/*",
-    "bower.json"
+    "bower.json",
+    "data.json"
   ],
   "extraDependencies": [
     "manifest.json",
@@ -20,12 +25,6 @@
   "builds": [
     {
       "preset": "es5-bundled"
-    },
-    {
-      "preset": "es6-bundled"
-    },
-    {
-      "preset": "es6-unbundled"
     }
   ]
 }

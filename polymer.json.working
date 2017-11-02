@@ -1,0 +1,39 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/my-app.html",
+  "fragments": [
+    "src/calendar-view.html",
+    "src/login-view.html",
+    "src/view404.html"
+  ],
+  "sources": [
+    "src/**/*",
+    "images/**/*",
+    "bower.json"
+  ],
+  "extraDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/*.js",
+    "bower_components/jquery/dist/jquery.min.js",
+    "bower_components/moment/min/moment.min.js",
+    "bower_components/fullcalendar/dist/fullcalendar.min.js",
+    "bower_components/fullcalendar/dist/locale-all.js"
+  ],
+  "lint": {
+    "rules": ["polymer-2"]
+  },
+  "builds": [
+    {
+      "preset": "es5-bundled",
+      "js": {"minify": false, "compile": true},
+      "css": {"minify": false},
+      "html": {"minify": false}
+    },
+    {
+      "preset": "es6-bundled"
+    },
+    {
+      "preset": "es6-unbundled"
+    }
+  ]
+}
