@@ -24,7 +24,15 @@
   },
   "builds": [
     {
-      "preset": "es5-bundled"
+      "preset": "es5-bundled",
+      "bundle": {
+        "excludes": [
+          "bower_components/jquery/dist/jquery.min.js",
+          "bower_components/moment/min/moment.min.js",
+          "bower_components/fullcalendar/dist/fullcalendar.min.js",
+          "bower_components/fullcalendar/dist/locale-all.js"
+        ]
+      }
     }
   ]
 }
