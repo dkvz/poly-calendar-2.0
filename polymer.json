@@ -33,6 +33,12 @@
           "bower_components/fullcalendar/dist/locale-all.js"
         ]
       }
+    },
+    {
+      "preset": "es6-bundled"
+    },
+    {
+      "preset": "es6-unbundled"
     }
   ]
 }
