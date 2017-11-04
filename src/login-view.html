@@ -8,7 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
@@ -62,50 +62,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>
 
-    Polymer({
+    class LoginView extends Polymer.Element {
+      static get is() { return 'login-view'; }
 
-      is: 'login-view',
+      static get properties() {
+        return {
+          authenticated: {
+            type: Boolean,
+            notify: true,
+            value: false
+          },
+          page: {
+            type: String,
+            notify: true
+          },
+          pageToRedirectTo: {
+            type: String,
+            notify: true
+          },
+          username: {
+            type: String,
+            notify: true
+          },
+          password: {
+            type: String,
+            notify: true
+          },
+          creds: {
+            type: Object,
+            notify: true,
+            value: {user: '', token: ''}
+          },
+          baseApiUrl: {
+            type: String,
+            value: 'http://localhost/v1/'
+          },
+          accountApiUrl: {
+            type: String,
+            value: 'account/token'
+          }
+        };
+      }
 
-      properties: {
-
-        authenticated: {
-          type: Boolean,
-          notify: true,
-          value: false
-        },
-        page: {
-          type: String,
-          notify: true
-        },
-        pageToRedirectTo: {
-          type: String,
-          notify: true
-        },
-        username: {
-          type: String,
-          notify: true
-        },
-        password: {
-          type: String,
-          notify: true
-        },
-        creds: {
-          type: Object,
-          notify: true,
-          value: {user: '', token: ''}
-        },
-        baseApiUrl: {
-          type: String,
-          value: 'http://localhost/v1/'
-        },
-        accountApiUrl: {
-          type: String,
-          value: 'account/token'
-        }
-
-      },
-
-      sendLogin: function() {
+      sendLogin() {
         // TODO Implement login logic.
         this.creds.user = 'al';
         this.creds.token = 'test';
@@ -114,8 +113,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.page = this.pageToRedirectTo;
       }
 
-    });
-
+    }
+    window.customElements.define(LoginView.is, LoginView);
   </script>
 
 </dom-module>
