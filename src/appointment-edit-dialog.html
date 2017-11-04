@@ -30,14 +30,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       .small {
         font-size: 0.82em;
       }
     </style>
 
     <style is="custom-style" include="shared-styles"></style>
-    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
 
     <!--<paper-dialog id="editDialog" no-cancel-on-outside-click no-cancel-on-esc-key always-on-top>-->
     <paper-dialog id="editDialog" modal always-on-top on-iron-overlay-opened="patchOverlay">

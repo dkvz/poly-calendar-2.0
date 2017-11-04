@@ -26,7 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       #appoint {
         border: var(--appointment-border-bottom, 4px solid silver);
         margin: 0;
@@ -48,7 +48,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <style is="custom-style" include="shared-styles"></style>
-    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
 
     <!-- The with-backdrop option makes the background darker when dialog is shown, not sure if it makes it modal -->
     <paper-dialog class="dialog" id="details" no-overlap entry-animation="scale-up-animation" exit-animation="fade-out-animation">
