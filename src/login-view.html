@@ -11,10 +11,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="shared-styles.html">
 
@@ -22,18 +23,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 
-    <style include="iron-flex iron-flex-alignment">
+    <style include="iron-flex iron-flex-alignment shared-styles">
       :host {
         display: block;
-      }
-      paper-material {
-        display: inline-block;
-        background: white;
-        box-sizing: border-box;
-        padding: 16px;
-      }
-      login-panel {
-        width: 50%;
       }
       align-center {
         margin-left: auto;
@@ -41,17 +33,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         clear: both;
         display: block;
       }
+      @media (min-width: 900px) {
+        div.card {
+          width: 350px;
+        }
+      }
     </style>
 
-    <style is="custom-style" include="shared-styles"></style>
+    <iron-ajax id="loginRequester"
+      handle-as="json"
+      on-response="calResponse"
+      on-error="calError">
+    </iron-ajax>
 
-    <paper-material elevation="2" class="layout vertical login-panel">
+    <div class="card layout vertical">
       <h2>Login</h2>
       <paper-input always-float-label label="Username" required="true" value="{{username}}"></paper-input>
       <paper-input always-float-label label="Password" required="true" value="{{password}}"></paper-input>
       <br />
-      <paper-icon-button icon="send" on-tap="sendLogin"></paper-icon-button>
-    </paper-material>
+      <!--<paper-icon-button icon="send" on-tap="sendLogin"></paper-icon-button>-->
+      <paper-button raised on-tap="sendLogin">
+        <iron-icon icon="send"></iron-icon>
+        Login
+      </paper-button>
+    </div>
 
   </template>
 
@@ -88,6 +93,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Object,
           notify: true,
           value: {user: '', token: ''}
+        },
+        baseApiUrl: {
+          type: String,
+          value: 'http://localhost/v1/'
+        },
+        accountApiUrl: {
+          type: String,
+          value: 'account/token'
         }
 
       },

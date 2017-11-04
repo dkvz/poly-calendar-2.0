@@ -22,7 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 
-    <style include="iron-flex iron-flex-alignment">
+    <style include="iron-flex iron-flex-alignment shared-styles">
       :host {
         --paper-input-container: {
           margin: 0;
@@ -39,8 +39,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin-top: 10px;
       }
     </style>
-
-    <style is="custom-style" include="shared-styles"></style>
 
     <div class="layout vertical diag">
       <h2>Détails</h2>
@@ -138,6 +136,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         language: {
           type: String,
           notify: true
+        },
+        baseApiUrl: {
+          type: String,
+          value: 'http://localhost/v1/'
+        },
+        personApiUrl: {
+          type: String,
+          value: 'address-book/persons'
         }
 
       },

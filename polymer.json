@@ -4,7 +4,7 @@
   "fragments": [
     "src/calendar-view.html",
     "src/login-view.html",
-    "src/view404.html"
+    "src/view-404.html"
   ],
   "sources": [
     "src/*.html",

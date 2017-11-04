@@ -43,7 +43,8 @@
     "paper-checkbox": "^2.0.1",
     "iron-pages": "^2.0.0",
     "neon-animation": "^2.0.1",
-    "iron-meta": "^2.0.2"
+    "iron-meta": "^2.0.2",
+    "paper-styles": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0"

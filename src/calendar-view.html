@@ -37,15 +37,17 @@ text-color="#ecf0f1"
       id="calRequester"
       url="data.json"
       auto
-      andle-as="json"
+      handle-as="json"
       on-response="calResponse"
       on-error="calError">
     </iron-ajax>
     <calendar-appointment id="appoint"></calendar-appointment>
+    <!-- The scheduler-component doesn't support direct bindings very well, so
+    I'm doing it in JS. -->
     <scheduler-component
             id="cal"
             default-view="agendaWeek"
-            events='[]'
+            events="[]"
             locale="fr"
             on-event-click="showEvent"
             on-day-click="dayClickEvent"
@@ -65,7 +67,7 @@ text-color="#ecf0f1"
           },
           currentRangeEnd: {
             type: String
-          },
+          }
         };
       }
 
