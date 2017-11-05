@@ -87,5 +87,7 @@ I had to add a script tag in the scheduler-component, this is the beginning of t
   * Add a refresh button somewhere to reload the current range of events.
   * Add a spinner when loading events.
   * Fix all the warnings issues by "polymer lint".
+  * There is a new way to do dom-if, look for all my uses of it to fix (on Polymer 2 elements).
+  * Aucunes de mes boites de dialogue ne scroll.
   * BACKEND: add a parameter to token generation to make it long term or short term.
   * BACKEND: token generation POST request could return expires, not necessary for the app though.

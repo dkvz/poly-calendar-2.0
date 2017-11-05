@@ -106,15 +106,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
             <div main-title>Appointments App</div>
-            <paper-icon-button icon="refresh"></paper-icon-button>
+            <paper-icon-button icon="refresh" on-tap="refreshAction"></paper-icon-button>
           </app-toolbar>
         </app-header>
 
         <iron-pages
-            selected="[[page]]"
-            attr-for-selected="name"
-            fallback-selection="view-404"
-            role="main">
+          selected="[[page]]"
+          attr-for-selected="name"
+          fallback-selection="view-404"
+          role="main">
 
           <calendar-view name="calendar-view" id="calView"></calendar-view>
           <login-view name="login-view" id="loginView"
@@ -201,6 +201,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       logout() {
         this.$.loginView.logout();
+      }
+
+      refreshAction() {
+        console.log('Refresh called');
       }
 
     }

@@ -36,6 +36,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         clear: both;
         display: block;
       }
+      div.card[hidden] {
+        display: none;
+      }
       @media (min-width: 900px) {
         div.card {
           width: 350px;
@@ -49,7 +52,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       on-error="_accountError">
     </iron-ajax>
 
-    <div class="card layout vertical">
+    <div class="card" hidden$="{{!cookieChecking}}">
+      <paper-spinner-lite active></paper-spinner-lite>
+    </div>
+
+    <div class="card layout vertical" hidden$="{{cookieChecking}}">
       <h2>Login</h2>
       <template is="dom-if" if="{{warningMessage}}">
         <div class="warning-message">
@@ -125,8 +132,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           stayConnected: {
             type: Boolean,
             value: false
+          },
+          cookieChecking: {
+            type: Boolean,
+            notify: true,
+            value: true
           }
         };
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        // Check if we have a cookie from a previous session.
+        this.cookieChecking = this.loginWithCookie();
       }
 
       sendLogin() {
@@ -235,8 +253,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var token = e.detail.response.token;
         var expires = e.detail.response.expires;
         var login = e.detail.response.login;
-        // Both requests have "token", or failed
-        if (token && login && expires) {
+        if (login && expires) {
           // The request was to check a token validity:
           var exp = new Date(expires);
           if (exp > Date.now()) {
@@ -252,6 +269,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this._removeCookie('token');
             this.authenticated = false;
           }
+          this.cookieChecking = false;
         } else if (token) {
           // The request was to generate a new token:
           this.saveTokenCookie(token);
@@ -288,6 +306,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.warningMessage = 'Login server unuvailable, try again later.';
         }
         this.password = '';
+        this.cookieChecking = false;
         this.loading = false;
       }
 
