@@ -10,6 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
@@ -57,15 +58,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
       <paper-input always-float-label label="Username" required="true" value="{{username}}"></paper-input>
       <paper-input always-float-label label="Password" required="true" value="{{password}}"></paper-input>
-      <paper-checkbox checked="{{stayConnected}}">Stay connected</paper-checkbox>
       <br />
-      <!--<paper-icon-button icon="send" on-tap="sendLogin"></paper-icon-button>-->
-      <div class="layout horizontal">
+      <div class="layout horizontal center">
         <paper-button raised on-tap="sendLogin">
           <iron-icon icon="send"></iron-icon>
           Login
         </paper-button>
-        <paper-spinner-lite active="{{loading}}"></paper-spinner-lite>
+        <paper-spinner-lite class="flex" active="{{loading}}"></paper-spinner-lite>
+        <paper-checkbox checked="{{stayConnected}}">Stay connected</paper-checkbox>
       </div>
     </div>
 
@@ -130,18 +130,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       sendLogin() {
-        this.getToken(this.username, this.password);
+        if (!this.loading) {
+          this.warningMessage = '';
+          this.getToken(this.username, this.password);
+        }
       }
 
       getToken(username, password) {
         this.$.loginRequester.url = this.baseApiUrl + this.accountApiUrl;
-        //this.$.loginRequester.body = '{"login": "' + username + 
-        //  '","password": "' + password + '"}';
+        // If content type is json, the object will be auto-stringified.
         this.$.loginRequester.body = {
           'login': username,
           'password': password
         };
-        this.$.creds.user = this.username;
+        this.creds.user = this.username;
         this.$.loginRequester.contentType = 'application/json';
         this.$.loginRequester.method = 'POST';
         this.loading = true;
@@ -177,19 +179,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$.loginRequester.method = 'GET';
           // No headers to add with this call.
           this.loading = true;
-          this.$.generateRequest();
+          this.$.loginRequester.generateRequest();
+          return true;
         }
-        return this.authenticated;
+        return false;
       }
 
       logout() {
         // We need to invalidate the cookie.
-
+        this._removeCookie('token');
+        this.creds.token = '';
+        this.warningMessage = 'You have been logged out.';
+        this.page = 'login-view';
       }
 
       _setCookie(cname, cvalue, exdays) {
         var expires = '';
-        if (exDays > 0) {
+        if (exdays > 0) {
           var d = new Date();
           d.setTime(d.getTime() + (exdays*24*60*60*1000));
           expires = 'expires=' + d.toUTCString();
@@ -217,23 +223,57 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return '';
       }
 
+      _removeCookie(cname) {
+        var expires = 'Expires=Thu, 01 Jan 1970 00:00:01 GMT';
+        document.cookie = cname + '=;path=/;' + expires;
+      }
+
       _accountResponse(e) {
-        this.loading = false;
+        // This iron-ajax can be used for POST or GET.
+        // We should check if the request for this response
+        // was POST or GET.
         var token = e.detail.response.token;
-        if (token) {
-          // This iron-ajax can be used for POST or GET.
-          this.creds.token = token;
-          this.authenticated = true;
-          console.log('Changing page to ' + this.pageToRedirectTo);
-          this.page = this.pageToRedirectTo;
+        var expires = e.detail.response.expires;
+        var login = e.detail.response.login;
+        // Both requests have "token", or failed
+        if (token && login && expires) {
+          // The request was to check a token validity:
+          var exp = new Date(expires);
+          if (exp > Date.now()) {
+            // Valid token.
+            // We could set the expiry of the cookie here.
+            // I'm not though.
+            this._openSession(token, e.detail.response.login);
+          } else {
+            // Invalid token, requires a new one.
+            this.page = 'login-view';
+            this.warningMessage = 'Session expired.';
+            // Remove the cookie:
+            this._removeCookie('token');
+            this.authenticated = false;
+          }
+        } else if (token) {
+          // The request was to generate a new token:
+          this.saveTokenCookie(token);
+          this._openSession(token, this.username);
         } else {
           this._authFailure();
         }
+        this.loading = false;
         this.password = '';
       }
 
+      _openSession(token, user) {
+        this.creds.token = token;
+        this.creds.user = user;
+        this.authenticated = true;
+        this.warningMessage = '';
+        console.log('Changing page to ' + this.pageToRedirectTo);
+        this.page = this.pageToRedirectTo;
+      }
+
       _accountError(e) {
-        this.loading = false;
+        this.page = 'login-view';
         console.log('HTTP error from iron-ajax');
         // e.detail.request.status can be null or undefined
         // in case of CORS-related error. We should check
@@ -248,10 +288,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.warningMessage = 'Login server unuvailable, try again later.';
         }
         this.password = '';
+        this.loading = false;
       }
 
       _authFailure() {
         this.warningMessage = 'Invalid username or password.';
+        this.authenticated = false;
       }
 
     }

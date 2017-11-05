@@ -91,7 +91,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             Address Book
           </a>
           <template is="dom-if" if="[[authenticated]]">
-              <a name="login-view" href="[[rootPath]]login-view">
+              <a name="login-view" href="[[rootPath]]login-view" on-tap="logout">
                   <iron-icon icon="lock-outline"></iron-icon>
                   Logout
               </a>
@@ -121,7 +121,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             page="{{page}}"
             page-to-redirect-to="calendar-view"
             authenticated="{{authenticated}}"
-            creds="{{creds}}">
+            creds="{{creds}}"
+            base-api-url="[[baseApiUrl]]">
           </login-view>
           <view-404 name="view-404"></view-404>
         </iron-pages>
@@ -188,15 +189,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // Load page import on demand. Show 404 page if fails
         var resolvedPageUrl = this.resolveUrl(page + '.html');
         Polymer.importHref(
-            resolvedPageUrl,
-            null,
-            this._showPage404.bind(this),
-            true);
+          resolvedPageUrl,
+          null,
+          this._showPage404.bind(this),
+          true);
       }
 
       _showPage404() {
         this.page = 'view-404';
       }
+
+      logout() {
+        this.$.loginView.logout();
+      }
+
     }
 
     window.customElements.define(MyApp.is, MyApp);
