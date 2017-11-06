@@ -30,7 +30,9 @@
     "iron-meta": "^2.0.2",
     "paper-spinner": "^2.0.0",
     "iron-ajax": "^2.0.5",
-    "paper-material": "^2.0.0"
+    "paper-material": "^2.0.0",
+    "iron-a11y-keys-behavior": "^2.0.1",
+    "paper-progress": "^2.0.1"
   },
   "resolutions": {
     "polymer": "^2.0.0",
@@ -44,7 +46,8 @@
     "iron-pages": "^2.0.0",
     "neon-animation": "^2.0.1",
     "iron-meta": "^2.0.2",
-    "paper-styles": "^2.0.0"
+    "paper-styles": "^2.0.0",
+    "iron-a11y-keys-behavior": "^2.0.1"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0"

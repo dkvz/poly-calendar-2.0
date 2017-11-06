@@ -116,7 +116,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           fallback-selection="view-404"
           role="main">
 
-          <calendar-view name="calendar-view" id="calView"></calendar-view>
+          <calendar-view name="calendar-view" id="calView"
+            base-api-url="[[baseApiUrl]]">
+          </calendar-view>
           <login-view name="login-view" id="loginView"
             page="{{page}}"
             page-to-redirect-to="calendar-view"
@@ -125,6 +127,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             base-api-url="[[baseApiUrl]]">
           </login-view>
           <view-404 name="view-404"></view-404>
+          
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>
@@ -158,7 +161,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           baseApiUrl: {
             type: String,
-            value: 'http://localhost/v1/'
+            value: 'http://api.croutte.net/v1/'
           }
         };
       }

@@ -20,6 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="login-view">
@@ -30,10 +31,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       :host {
         display: block;
       }
-      align-center {
+      .align-center {
         margin-left: auto;
         margin-right: auto;
-        clear: both;
         display: block;
       }
       div.card[hidden] {
@@ -64,14 +64,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </template>
       <paper-input always-float-label label="Username" required="true" value="{{username}}"></paper-input>
-      <paper-input always-float-label label="Password" required="true" value="{{password}}"></paper-input>
+      <paper-input always-float-label label="Password" required="true" type="password" value="{{password}}"></paper-input>
       <br />
       <div class="layout horizontal center">
         <paper-button raised on-tap="sendLogin">
           <iron-icon icon="send"></iron-icon>
           Login
         </paper-button>
-        <paper-spinner-lite class="flex" active="{{loading}}"></paper-spinner-lite>
+        <div class="flex">
+          <paper-spinner-lite class="align-center" active="{{loading}}"></paper-spinner-lite>
+        </div>
         <paper-checkbox checked="{{stayConnected}}">Stay connected</paper-checkbox>
       </div>
     </div>
@@ -80,7 +82,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <script>
 
-    class LoginView extends Polymer.Element {
+    class LoginView extends Polymer.mixinBehaviors([Polymer.IronA11yKeysBehavior], Polymer.Element) {
       static get is() { return 'login-view'; }
 
       static get properties() {
@@ -139,6 +141,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: true
           }
         };
+      }
+
+      get keyBindings() {
+        return {
+          'enter': 'sendLogin'
+        }
       }
 
       connectedCallback() {

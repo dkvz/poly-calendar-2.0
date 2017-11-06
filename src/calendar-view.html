@@ -17,6 +17,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="scheduler-component/scheduler-component.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="calendar-appointment.html">
 <link rel="import" href="shared-styles.html">
 
@@ -42,6 +43,7 @@ text-color="#ecf0f1"
       on-error="calError">
     </iron-ajax>
     <calendar-appointment id="appoint"></calendar-appointment>
+    
     <!-- The scheduler-component doesn't support direct bindings very well, so
     I'm doing it in JS. -->
     <scheduler-component
@@ -67,6 +69,14 @@ text-color="#ecf0f1"
           },
           currentRangeEnd: {
             type: String
+          },
+          baseApiUrl: {
+            type: String,
+            value: 'http://api.croutte.net/v1/'
+          },
+          eventApiUrl: {
+            type: String,
+            value: 'cal/events'
           }
         };
       }

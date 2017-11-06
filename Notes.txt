@@ -77,7 +77,11 @@ I had to add a script tag in the scheduler-component, this is the beginning of t
 <script src="../fullcalendar/dist/locale-all.js"></script>
 </code>
 
-==== TODO ====
+===== Other issues =====
+  * Style des boutons "raised" ne fonctionne pas: c'est dû à l'utilisation d'une version de paper-styles < 2.0. Bien que la version 2+ soit dans bower.json, il faut apparemment manuellement faire un ''bower install paper-styles''.
+    * -> Il faudrait vérifier si ça se passe normalement en faisant un bower install initial après un clone du repo.
+
+===== TODO =====
   * Test a 1.0 element like the scheduler thingy, see if I can control it from the ES6 code.
     * Check if it works on mobile and on Firefox.
   * Add to README or something that scheduler-component has to be edited or import that component in another way (probably putting it in src).
@@ -89,5 +93,6 @@ I had to add a script tag in the scheduler-component, this is the beginning of t
   * Fix all the warnings issues by "polymer lint".
   * There is a new way to do dom-if, look for all my uses of it to fix (on Polymer 2 elements).
   * Aucunes de mes boites de dialogue ne scroll.
+  * Permettre de submit le formulaire login avec Enter.
   * BACKEND: add a parameter to token generation to make it long term or short term.
   * BACKEND: token generation POST request could return expires, not necessary for the app though.
