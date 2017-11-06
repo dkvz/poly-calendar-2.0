@@ -23,6 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="my-icons.html">
 
 <link rel="lazy-import" href="calendar-view.html">
@@ -68,6 +69,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: black;
         font-weight: bold;
       }
+
+      paper-progress {
+        display: block;
+        width: 100%;
+        --paper-progress-active-color: rgba(255, 255, 255, 0.5);
+        --paper-progress-container-color: transparent;
+      }
     </style>
 
     <app-location route="{{route}}" url-space-regex="^[[rootPath]]"></app-location>
@@ -107,6 +115,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
             <div main-title>Appointments App</div>
             <paper-icon-button icon="refresh" on-tap="refreshAction"></paper-icon-button>
+            <paper-progress value="0" indeterminate="[[syncing]]" bottom-item></paper-progress>
           </app-toolbar>
         </app-header>
 
@@ -117,7 +126,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           role="main">
 
           <calendar-view name="calendar-view" id="calView"
-            base-api-url="[[baseApiUrl]]">
+            base-api-url="[[baseApiUrl]]"
+            syncing="{{syncing}}"
+            creds="{{creds}}"
+            page="{{page}}">
           </calendar-view>
           <login-view name="login-view" id="loginView"
             page="{{page}}"
@@ -162,6 +174,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           baseApiUrl: {
             type: String,
             value: 'http://api.croutte.net/v1/'
+          },
+          syncing: {
+            type: Boolean,
+            value: false,
+            notify: true
           }
         };
       }

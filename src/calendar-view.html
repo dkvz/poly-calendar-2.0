@@ -36,24 +36,24 @@ text-color="#ecf0f1"
 -->
     <iron-ajax
       id="calRequester"
-      url="data.json"
-      auto
       handle-as="json"
+      url="[[baseApiUrl]]/[[eventApiUrl]]"
       on-response="calResponse"
       on-error="calError">
     </iron-ajax>
+
     <calendar-appointment id="appoint"></calendar-appointment>
-    
     <!-- The scheduler-component doesn't support direct bindings very well, so
     I'm doing it in JS. -->
     <scheduler-component
-            id="cal"
-            default-view="agendaWeek"
-            events="[]"
-            locale="fr"
-            on-event-click="showEvent"
-            on-day-click="dayClickEvent"
-            on-date-range-changed="dateRangeChanged">
+      id="cal"
+      default-view="agendaWeek"
+      events="[]"
+      locale="fr"
+      on-event-click="showEvent"
+      on-day-click="dayClickEvent"
+      on-date-range-changed="dateRangeChanged"
+      on-view-render="calViewRendered">
     </scheduler-component>
 
   </template>
@@ -64,11 +64,15 @@ text-color="#ecf0f1"
 
       static get properties() {
         return {
+          /**
+          * These two Objects will either be
+          * Dates or momentJS dates.
+          **/
           currentRangeStart: {
-            type: String
+            type: Object
           },
           currentRangeEnd: {
-            type: String
+            type: Object
           },
           baseApiUrl: {
             type: String,
@@ -77,16 +81,40 @@ text-color="#ecf0f1"
           eventApiUrl: {
             type: String,
             value: 'cal/events'
+          },
+          syncing: {
+            type: Boolean,
+            notify: true
+          },
+          errorMessage: {
+            type: String,
+            notify: true,
+            value: ''
+          },
+          page: {
+            type: String,
+            notify: true
+          },
+          creds: {
+            type: Object,
+            notify: true,
+            value: {user: '', token: ''}
           }
         };
       }
 
-      ready() {
-        super.ready();
-        // We need to make the inital AJAX call.
-        // Also set the currentRangeStart and
-        // currentRangeEnd.
-        console.log('Called ready.');
+      connectedCallback() {
+        super.connectedCallback();
+        // Generate first request.
+        // I'm doing my request manually to have more control
+        // on progress bars and all that.
+        // There's a lot of JS going on in fullCalendar that is
+        // slowing down the page, independantly of the AJAX stuff.
+        this.syncing = true;
+        // I need to fetch events at least for the displayed time
+        // range of the calendar.
+        // But I'm not sure this is even available at this time...
+        // So this is going to be bound to calendar events instead.
       }
 
       doesItWork() {
@@ -115,15 +143,27 @@ text-color="#ecf0f1"
 
       calResponse(e) {
         // I know I could bind this in the template but I'd rather not.
-        console.log('Received AJAX response.');
+        // For the moment I'm erasing the current events array at every
+        // date range view change.
         this.$.cal.events = e.detail.response.events;
+        this.errorMessage = '';
       }
 
       calError(e) {
         // Handle the AJAX request not working, check for what reason.
         // Most probably should be authentication issues.
-        console.log('Received AJAX error:');
-        console.log(e);
+        console.log('HTTP error on calendar request.');
+        var status = e.detail.request.status;
+        switch (status) {
+          case 403:
+            this.page = 'login-view';
+            break;
+          case 400:
+            this.errorMessage = 'Illegal request to application, please refresh and try again.';
+            break;
+          default:
+            this.errorMessage = 'Application error, please try again later.';
+        }
       }
 
       dayClickEvent(e) {
@@ -142,6 +182,27 @@ text-color="#ecf0f1"
       dateRangeChanged(e) {
         console.log('Date range changed manually.');
         console.log(e);
+      }
+
+      calViewRendered(v) {
+        // This is called whenever the user changes the
+        // calendar displayed date range.
+        // Also fires when it's first rendered.
+        // We got v.detail.view.start and end being
+        // moment objects for the date range.
+        // End seems to sometime be just the day after
+        // the last displayed day.
+        this.$.calRequester.params = {
+          'start': v.detail.view.start.format(),
+          'end': v.detail.view.end.format()
+        };
+        // Add authentication:
+        this.$.calRequester.headers = {
+          'Authorization': 'bearer ' + this.creds.token
+        };
+        this.currentRangeEnd = v.detail.view.end;
+        this.currentRangeStart = v.detail.view.start;
+        this.$.calRequester.generateRequest();
       }
 
     }

@@ -49,7 +49,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax id="loginRequester"
       handle-as="json"
       on-response="_accountResponse"
-      on-error="_accountError">
+      on-error="_accountError"
+      loading="{{loading}}">
     </iron-ajax>
 
     <div class="card" hidden$="{{!cookieChecking}}">
@@ -172,7 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.creds.user = this.username;
         this.$.loginRequester.contentType = 'application/json';
         this.$.loginRequester.method = 'POST';
-        this.loading = true;
+        //this.loading = true;
         this.warningMessage = '';
         this.$.loginRequester.generateRequest();
       }
@@ -204,7 +205,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$.loginRequester.contentType = null;
           this.$.loginRequester.method = 'GET';
           // No headers to add with this call.
-          this.loading = true;
+          //this.loading = true;
           this.$.loginRequester.generateRequest();
           return true;
         }
@@ -212,11 +213,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       logout() {
-        // We need to invalidate the cookie.
-        this._removeCookie('token');
-        this.creds.token = '';
-        this.warningMessage = 'You have been logged out.';
-        this.page = 'login-view';
+        if (!this.loading) {
+          // We need to invalidate the cookie.
+          this._removeCookie('token');
+          //console.log('Logout for token ' + this.creds.token);
+          if (this.creds.token) {
+            this._removeTokenFromServer(this.creds.token);
+          }
+          this.creds.token = '';
+          this.warningMessage = 'You have been logged out.';
+          this.page = 'login-view';
+        }
+      }
+
+      _removeTokenFromServer(token) {
+        var ajax = document.createElement('iron-ajax');
+        ajax.url = this.baseApiUrl + this.accountApiUrl + 
+          '/' + token;
+        ajax.method = 'DELETE';
+        // The listeners were just for debugging
+        /* ajax.addEventListener('response', e => {
+          console.log('Token deletion worked:');
+          console.log(e.detail.response);
+        });
+        ajax.addEventListener('error', e => {
+          console.log('Token deletion error:');
+          console.log(e.detail.response);
+        }); */
+        ajax.generateRequest();
+        // I have no idea if this element just sticks around forever now.
+        // Not really an issue since we're not supposed to log in and out
+        // 100000 times.
       }
 
       _setCookie(cname, cvalue, exdays) {
@@ -285,17 +312,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           this._authFailure();
         }
-        this.loading = false;
+        //this.loading = false;
         this.password = '';
-      }
-
-      _openSession(token, user) {
-        this.creds.token = token;
-        this.creds.user = user;
-        this.authenticated = true;
-        this.warningMessage = '';
-        console.log('Changing page to ' + this.pageToRedirectTo);
-        this.page = this.pageToRedirectTo;
       }
 
       _accountError(e) {
@@ -315,7 +333,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         this.password = '';
         this.cookieChecking = false;
-        this.loading = false;
+        //this.loading = false;
+      }
+
+      _openSession(token, user) {
+        this.creds.token = token;
+        this.creds.user = user;
+        this.authenticated = true;
+        this.warningMessage = '';
+        console.log('Changing page to ' + this.pageToRedirectTo);
+        this.page = this.pageToRedirectTo;
       }
 
       _authFailure() {
