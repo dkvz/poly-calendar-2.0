@@ -13,6 +13,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../bower_components/iron-icons/image-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
@@ -57,30 +58,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <h2 class="flex">Détails</h2>
         <paper-icon-button icon="cancel" title="Close" on-tap="close"></paper-icon-button>
       </div>
-      <p>
-        <b>Name:&nbsp;</b>
-        <a id="detailsLink" on-tap="showPersonDetails" href="">{{displayedName}}</a>
-      </p>
-      <p>
-        <b>Date:&nbsp;</b>{{date}}
-      </p>
-      <p>
-        <b>Starting at:&nbsp;</b>{{startTime}}
-      </p>
-      <p>
-        <b>Ending at:&nbsp;</b>{{endTime}}
-      </p>
-      <p>
-        <b>Type:&nbsp;</b>{{type}}
-      </p>
-      <p>
-        <template is="dom-if" if="{{location}}">
-          <b>Localisation:&nbsp;</b>{{location}}
-        </template>
-        <div>
-          <paper-fab icon="image:edit" on-tap="edit"></paper-fab>
-        </div>
-      </p>
+      <paper-dialog-scrollable>
+        <p>
+          <b>Name:&nbsp;</b>
+          <a id="detailsLink" on-tap="showPersonDetails" href="">{{displayedName}}</a>
+        </p>
+        <p>
+          <b>Date:&nbsp;</b>{{date}}
+        </p>
+        <p>
+          <b>Starting at:&nbsp;</b>{{startTime}}
+        </p>
+        <p>
+          <b>Ending at:&nbsp;</b>{{endTime}}
+        </p>
+        <p>
+          <b>Type:&nbsp;</b>{{type}}
+        </p>
+        <p>
+          <template is="dom-if" if="{{location}}">
+            <b>Localisation:&nbsp;</b>{{location}}
+          </template>
+          <div>
+            <paper-fab icon="image:edit" on-tap="edit"></paper-fab>
+          </div>
+        </p>
+      </paper-dialog-scrollable>
     </paper-dialog>
     <paper-dialog class="dialog" id="personDetails">
       <person-details id="personDetailsEl" edit-mode="{{personEditMode}}" first-name="Test name" last-name="Test last name"></person-details>

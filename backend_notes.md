@@ -1,5 +1,8 @@
 # Application Notes
 
+**WARNING**
+-> Some stuff here has changed, the correct reference is the real notes.md on the backend repository (which is not public btw).
+
 ## Database
 
 ### Token authentication system

@@ -94,5 +94,6 @@ I had to add a script tag in the scheduler-component, this is the beginning of t
   * There is a new way to do dom-if, look for all my uses of it to fix (on Polymer 2 elements).
   * Aucunes de mes boites de dialogue ne scroll.
   * Permettre de submit le formulaire login avec Enter.
+  * The calendar view should collapse earlier than it does. It's not going to look good on tablets right now.
   * BACKEND: add a parameter to token generation to make it long term or short term.
   * BACKEND: token generation POST request could return expires, not necessary for the app though.

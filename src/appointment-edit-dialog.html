@@ -15,6 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
@@ -40,65 +41,69 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <!--<paper-dialog id="editDialog" no-cancel-on-outside-click no-cancel-on-esc-key always-on-top>-->
     <paper-dialog id="editDialog" modal always-on-top on-iron-overlay-opened="patchOverlay">
-      <div class="layout vertical">
-        <h2>Editer le rendez-vous</h2>
-        <template is="dom-if" if="{{warningMessage}}">
-          <div class="warning">{{warningMessage}}</div>
-        </template>
-        <paper-input label="Nom" id="inputName" value="{{displayedName}}"></paper-input>
-        <div class="small">
-          <a href="#" on-tap="showEditPerson">Enregistrer cette personne...</a>
-        </div>
-        <paper-input label="Localisation" id="inputLocation" value="{{location}}"></paper-input>
-        <!--
-        <paper-dropdown-menu label="Type de rendez-vous" id="appointmentType">
-          <paper-listbox class="dropdown-content" selected="{{typeSelectedId}}" id="typeList">
-            <template is="dom-repeat" items="{{appointmentTypes}}">
-              <paper-item style="background-color: {{item.color}}">{{item.type}}</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
-        -->
+      <paper-dialog-scrollable>
+        <div class="layout vertical">
+          <h2>Editer le rendez-vous</h2>
+          <template is="dom-if" if="{{warningMessage}}">
+            <div class="warning">{{warningMessage}}</div>
+          </template>
+          <paper-input label="Nom" id="inputName" value="{{displayedName}}"></paper-input>
+          <div class="small">
+            <a href="#" on-tap="showEditPerson">Enregistrer cette personne...</a>
+          </div>
+          <paper-input label="Localisation" id="inputLocation" value="{{location}}"></paper-input>
+          <!--
+          <paper-dropdown-menu label="Type de rendez-vous" id="appointmentType">
+            <paper-listbox class="dropdown-content" selected="{{typeSelectedId}}" id="typeList">
+              <template is="dom-repeat" items="{{appointmentTypes}}">
+                <paper-item style="background-color: {{item.color}}">{{item.type}}</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          -->
 
-        <!--
-        <div>
-          Nombre de blocs (par demi-heure): <b>{{blocs}}</b>&nbsp;
-        </div>
-        <div class="layout horizontal end-justified">
-          <paper-icon-button icon="add-box" title="Add" on-tap="addBloc"></paper-icon-button>
-          <paper-icon-button icon="indeterminate-check-box" title="Remove" on-tap="removeBloc"></paper-icon-button>
-        </div>
-        -->
-        <div class="horizontal center layout">
-          <div class="flex">Heure début:</div><paper-input no-label-float maxlength="2" size="2" id="inputStartTimeH" value="{{startTimeH}}"></paper-input>
-          <div>:</div>
-          <paper-input maxlength="2" id="inputStartTimeM" no-label-float size="2" value="{{startTimeM}}"></paper-input>
-        </div>
-        <div class="horizontal center layout">
-          <div class="flex">Heure fin:</div><paper-input no-label-float maxlength="2" size="2" id="inputEndTimeH" value="{{endTimeH}}"></paper-input>
-          <div>:</div>
-          <paper-input maxlength="2" id="inputEndTimeM" no-label-float size="2" value="{{endTimeM}}"></paper-input>
-        </div>
+          <!--
+          <div>
+            Nombre de blocs (par demi-heure): <b>{{blocs}}</b>&nbsp;
+          </div>
+          <div class="layout horizontal end-justified">
+            <paper-icon-button icon="add-box" title="Add" on-tap="addBloc"></paper-icon-button>
+            <paper-icon-button icon="indeterminate-check-box" title="Remove" on-tap="removeBloc"></paper-icon-button>
+          </div>
+          -->
+          <div class="horizontal center layout">
+            <div class="flex">Heure début:</div><paper-input no-label-float maxlength="2" size="2" id="inputStartTimeH" value="{{startTimeH}}"></paper-input>
+            <div>:</div>
+            <paper-input maxlength="2" id="inputStartTimeM" no-label-float size="2" value="{{startTimeM}}"></paper-input>
+          </div>
+          <div class="horizontal center layout">
+            <div class="flex">Heure fin:</div><paper-input no-label-float maxlength="2" size="2" id="inputEndTimeH" value="{{endTimeH}}"></paper-input>
+            <div>:</div>
+            <paper-input maxlength="2" id="inputEndTimeM" no-label-float size="2" value="{{endTimeM}}"></paper-input>
+          </div>
 
-        <br />
-        <div>Rappel:</div>
-        <div class="layout horizontal around-justified">
-          <paper-checkbox checked="{{reminderEmail}}">Par Email</paper-checkbox>
-          <paper-checkbox checked="{{reminderSms}}">Par SMS</paper-checkbox>
-        </div>
+          <br />
+          <div>Rappel:</div>
+          <div class="layout horizontal around-justified">
+            <paper-checkbox checked="{{reminderEmail}}">Par Email</paper-checkbox>
+            <paper-checkbox checked="{{reminderSms}}">Par SMS</paper-checkbox>
+          </div>
 
-        <hr width="100%" />
-        <div class="layout horizontal end-justified">
-          <!-- I need a delete button if a displayedName exists -->
-          <paper-icon-button icon="save" title="Save" on-tap="save"></paper-icon-button>
-          <paper-icon-button icon="delete" title="Delete" on-tap="remove"></paper-icon-button>
-          <paper-icon-button icon="cancel" title="Cancel" on-tap="cancel"></paper-icon-button>
+          <hr width="100%" />
+          <div class="layout horizontal end-justified">
+            <!-- I need a delete button if a displayedName exists -->
+            <paper-icon-button icon="save" title="Save" on-tap="save"></paper-icon-button>
+            <paper-icon-button icon="delete" title="Delete" on-tap="remove"></paper-icon-button>
+            <paper-icon-button icon="cancel" title="Cancel" on-tap="cancel"></paper-icon-button>
+          </div>
         </div>
-      </div>
+      </paper-dialog-scrollable>
     </paper-dialog>
 
     <paper-dialog id="personDetails" modal always-on-top>
-      <person-details id="personDetailsEl" edit-mode first-name="Test name" last-name="Test last name"></person-details>
+      <paper-dialog-scrollable>
+        <person-details id="personDetailsEl" edit-mode first-name="Test name" last-name="Test last name"></person-details>
+      </paper-dialog-scrollable>
       <div class="layout horizontal end-justified" style="margin-top: 0">
         <paper-icon-button icon="save" title="Save" on-tap="savePersonDetails"></paper-icon-button>
         <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
