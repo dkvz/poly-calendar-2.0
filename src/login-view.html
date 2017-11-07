@@ -295,6 +295,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             // Valid token.
             // We could set the expiry of the cookie here.
             // I'm not though.
+            token = this.readTokenCookie();
             this._openSession(token, e.detail.response.login);
           } else {
             // Invalid token, requires a new one.

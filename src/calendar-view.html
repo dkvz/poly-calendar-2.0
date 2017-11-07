@@ -37,7 +37,7 @@ text-color="#ecf0f1"
     <iron-ajax
       id="calRequester"
       handle-as="json"
-      url="[[baseApiUrl]]/[[eventApiUrl]]"
+      url="[[baseApiUrl]][[eventApiUrl]]"
       on-response="calResponse"
       on-error="calError">
     </iron-ajax>
@@ -138,21 +138,29 @@ text-color="#ecf0f1"
       reloadEvents() {
         // Refresh the events in the same range as the one we
         // currently are.
-
+        console.log('Called reload.');
+        this._getEventsForRange(this.$.cal.getView().start, this.$.cal.getView().end);
       }
 
       calResponse(e) {
         // I know I could bind this in the template but I'd rather not.
         // For the moment I'm erasing the current events array at every
         // date range view change.
-        this.$.cal.events = e.detail.response.events;
+        var events = e.detail.response.events;
+        if (events instanceof Array) {
+          this.$.cal.events = events;
+        } else {
+          this.$.cal.events = [];
+        }
         this.errorMessage = '';
+        this.syncing = false;
       }
 
       calError(e) {
         // Handle the AJAX request not working, check for what reason.
         // Most probably should be authentication issues.
         console.log('HTTP error on calendar request.');
+        this.syncing = false;
         var status = e.detail.request.status;
         switch (status) {
           case 403:
@@ -192,16 +200,21 @@ text-color="#ecf0f1"
         // moment objects for the date range.
         // End seems to sometime be just the day after
         // the last displayed day.
+        this._getEventsForRange(v.detail.view.start, v.detail.view.end);
+      }
+
+      _getEventsForRange(start, end) {
+        this.syncing = true;
         this.$.calRequester.params = {
-          'start': v.detail.view.start.format(),
-          'end': v.detail.view.end.format()
+          'start': start.format(),
+          'end': end.format()
         };
         // Add authentication:
         this.$.calRequester.headers = {
           'Authorization': 'bearer ' + this.creds.token
         };
-        this.currentRangeEnd = v.detail.view.end;
-        this.currentRangeStart = v.detail.view.start;
+        this.currentRangeEnd = end;
+        this.currentRangeStart = start;
         this.$.calRequester.generateRequest();
       }
 
