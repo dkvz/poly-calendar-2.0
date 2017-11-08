@@ -24,6 +24,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/vaadin-material-theme/vaadin-combo-box.html">
+<link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
 <link rel="import" href="person-details.html">
 <link rel="import" href="shared-styles.html">
 
@@ -81,6 +83,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div>:</div>
             <paper-input maxlength="2" id="inputEndTimeM" no-label-float size="2" value="{{endTimeM}}"></paper-input>
           </div>
+          <paper-input label="Téléphone mobile" id="inputPhoneMobile" value="{{phoneMobile}}"></paper-input>
+          <paper-input labal="Email" id="inputEmail" type="email" value="{{email}}"></paper-input>
 
           <br />
           <div>Rappel:</div>
@@ -112,7 +116,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   </template>
 
-    <script>
+  <script>
 
     Polymer({
 
@@ -123,6 +127,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         displayedName: {
           type: String,
           notify: true
+        },
+        eventId: {
+          type: Number,
+          notify: true,
+          value: -1
         },
         date: {
           type: String,
@@ -148,11 +157,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: String,
           notify: true
         },
-        blocs: {
-          type: Number,
-          notify: true,
-          value: 1
-        },
         startTimeM: {
           type: String
         },
@@ -164,13 +168,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         endTimeH: {
           type: String
-        },
-        /**
-          Maximum endTime we can have.
-        **/
-        maxEndTime: {
-          type: String,
-          value: '23:00'
         },
         modified: {
           type: Boolean,
@@ -205,6 +202,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           notify: true,
           value: false
         },
+        phoneMobile: {
+          type: String,
+          notify: true
+        },
+        email: {
+          type: String,
+          notify: true
+        },
         newAppointment: {
           type: Boolean,
           notify: true,
@@ -212,23 +217,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         baseApiUrl: {
           type: String,
-          value: 'http://localhost/v1/'
+          value: 'http://api.croutte.net/v1/'
         },
         eventApiUrl: {
           type: String,
           value: 'cal/events'
+        },
+        personId: {
+          type: Number,
+          notify: true,
+          value: -1
         }
 
       },
       save: function() {
-        console.log('Hit save');
+        // Check if editing or not.
+        // We have the legacy newAppointment boolean
+        // or the presence of eventId > 0.
+        if (this.eventId > 0) {
+          // Editing.
 
-        this.saveOriginalData();
+        } else {
+          // Creating new event.
+
+        }
+        //this.saveOriginalData();
         this.close();
         this.modified = true;
       },
       attached: function() {
-        // This is only called once.
+        // This is only called once since we use just one of these
+        // elements.
       },
       _setDropdownPosition: function() {
         for (var i = 0; i < this.appointmentTypes.length; i++) {
@@ -244,6 +263,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.color = this.appointmentTypes[index].color;
       },
       saveOriginalData: function() {
+        // I don't think we need this function anymore
+        // because we're not binding the event data to 
+        // the main page here.
         this.originalData = {
           location: this.location,
           displayedName: this.displayedName,
@@ -263,10 +285,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.editDialog.open();
       },
       cancel: function() {
-        this.displayedName = this.originalData.displayedName;
-
-        this.location = this.originalData.location;
-        this.type = this.originalData.type;
         this.close();
       },
       close: function() {

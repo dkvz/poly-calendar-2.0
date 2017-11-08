@@ -77,6 +77,21 @@ I had to add a script tag in the scheduler-component, this is the beginning of t
 <script src="../fullcalendar/dist/locale-all.js"></script>
 </code>
 
+===== Autocomplete for "person" =====
+I'm using this component:
+```
+bower install --save vaadin/vaadin-material-theme vaadin/vaadin-combo-box
+```
+Which requires two imports:
+```
+<link rel="import" href="../bower_components/vaadin-material-theme/vaadin-combo-box.html">
+<link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+```
+
+The documentation is here: https://vaadin.com/elements/vaadin-combo-box/
+
+We're going to need an iron-ajax dedicated to that component.
+
 ===== Other issues =====
   * Style des boutons "raised" ne fonctionne pas: c'est dû à l'utilisation d'une version de paper-styles < 2.0. Bien que la version 2+ soit dans bower.json, il faut apparemment manuellement faire un ''bower install paper-styles''.
     * -> Il faudrait vérifier si ça se passe normalement en faisant un bower install initial après un clone du repo.
@@ -95,5 +110,6 @@ I had to add a script tag in the scheduler-component, this is the beginning of t
   * Aucunes de mes boites de dialogue ne scroll.
   * Permettre de submit le formulaire login avec Enter.
   * The calendar view should collapse earlier than it does. It's not going to look good on tablets right now.
+  * In all the event edition stuff, the presence a valid eventId can replace the "newAppointment" boolean.
   * BACKEND: add a parameter to token generation to make it long term or short term.
   * BACKEND: token generation POST request could return expires, not necessary for the app though.

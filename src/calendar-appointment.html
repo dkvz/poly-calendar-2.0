@@ -102,6 +102,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </paper-dialog>
     <appointment-edit-dialog
       id="editDialog"
+      event-id="{{eventId}}"
       date="[[date]]"
       displayed-name="{{displayedName}}"
       location="{{location}}"
@@ -114,7 +115,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       appointment-types="{{appointmentTypes}}"
       reminder-email="{{reminderEmail}}"
       reminder-sms="{{reminderSms}}"
-      new-appointment="{{newAppointment}}">
+      phone-mobile="{{phoneMobile}}"
+      email="{{email}}"
+      new-appointment="{{newAppointment}}"
+      person-id="{{personId}}">
     </appointment-edit-dialog>
 
   </template>
@@ -131,9 +135,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: String,
           notify: true
         },
+        eventId: {
+          type: Number,
+          notify: true,
+          value: -1
+        },
         personId: {
           type: Number,
-          notify: true
+          notify: true,
+          value: -1
         },
         date: {
           type: String,
@@ -184,6 +194,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Boolean,
           notify: true,
           value: false
+        },
+        phoneMobile: {
+          type: String,
+          notify: true
+        },
+        email: {
+          type: String,
+          notify: true
         },
         personEditMode: {
           type: Boolean,
