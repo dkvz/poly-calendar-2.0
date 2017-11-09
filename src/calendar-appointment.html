@@ -119,7 +119,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       email="{{email}}"
       new-appointment="{{newAppointment}}"
       person-id="{{personId}}"
-      creds="{{creds}}">
+      creds="{{creds}}"
+      base-api-url="[[baseApiUrl]]">
     </appointment-edit-dialog>
 
   </template>
@@ -218,6 +219,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Object,
           notify: true,
           value: {user: '', token: ''}
+        },
+        baseApiUrl: {
+          type: String,
+          value: 'http://api.croutte.net/v1/'
         }
 
       },
@@ -258,7 +263,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return date.format('HH:mm');
       },
       clear: function() {
-        this.data = [];
         this.modified = false;
         this.newAppointment = false;
         this.personId = 0;

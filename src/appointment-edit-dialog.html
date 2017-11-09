@@ -50,6 +50,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       on-response="_autocompleterResponse">
     </iron-ajax>
 
+    <iron-ajax id="eventCreator"
+      handle-as="json"
+      content-type="application/json"
+      loading="{{syncing}}"
+      url="[[baseApiUrl]][[eventApiUrl]]"
+      method="POST"
+      on-error="_eventCreatorError"
+      on-response="_eventCreatorResponse">
+    </iron-ajax>
+
     <!--<paper-dialog id="editDialog" no-cancel-on-outside-click no-cancel-on-esc-key always-on-top>-->
     <paper-dialog id="editDialog" modal always-on-top on-iron-overlay-opened="patchOverlay">
       <paper-dialog-scrollable>
@@ -73,7 +83,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value-property="id"
             text-property="lastname"
             show-results-on-focus
-            on-autocomplete-selected="_autocompleteSelected">
+            on-autocomplete-selected="_autocompleteSelected"
+            text="{{displayedName}}">
 
             <template slot="autocomplete-custom-template">
               <!-- NOTICE: Due to shadow-dom, custom template styles need to be included with the template in Polymer 2.x -->
@@ -217,6 +228,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Object,
           notify: false
         },
+        data: {
+          type: Array,
+          notify: true
+        }
         type: {
           type: String,
           notify: true
@@ -232,10 +247,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         endTimeH: {
           type: String
-        },
-        modified: {
-          type: Boolean,
-          notify: true
         },
         warningMessage: {
           type: String,
@@ -315,6 +326,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Object,
           notify: true,
           value: {user: '', token: ''}
+        },
+        syncing: {
+          type: Boolean,
+          notify: true,
+          value: false
         }
 
       },
@@ -322,20 +338,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // Check if editing or not.
         // We have the legacy newAppointment boolean
         // or the presence of eventId > 0.
-        if (this.eventId > 0) {
-          // Editing.
-
-        } else {
-          // Creating new event.
-
+        if (!this.syncing) {
+          if (this.displayedName) {
+            this.warningMessage = '';
+            var reqBody = {
+              'start': this.startTimeH + ':' + this.startTimeM,
+              'end': this.endTimeH + ':' + this.endTimeM,
+              'date': this.date.format('DD/MM/YYYY'),
+              'displayedName': this.displayedName,
+              'location': this.location,
+              'reminderEmail': this.reminderEmail,
+              'reminderSms': this.reminderSms,
+              'email': this.email,
+              'phoneMobile': this.phoneMobile
+            };
+            // Check if we add a personId:
+            if (this.personId > 0) {
+              reqBody.personId = this.personId;
+            }
+            this.$.eventCreator.headers = {
+              'Authorization': 'bearer ' + this.creds.token
+            };
+            if (this.eventId > 0) {
+              // Editing.
+              reqBody.eventId = this.eventId;
+            }
+            this.$.eventCreator.body = reqBody;
+            this.$.eventCreator.generateRequest();
+          } else {
+            this.warningMessage = 'Providing a name is mandatory.';
+          }
         }
         //this.saveOriginalData();
-        this.close();
-        this.modified = true;
       },
       attached: function() {
         // This is only called once since we use just one of these
         // elements.
+        // For some reason giving this function through the element
+        // arguments doesn't work very well.
         this.$.inputName.queryFn = this._queryfn;
       },
       _setDropdownPosition: function() {
@@ -364,8 +404,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       remove: function() {
 
         this.close();
-        // Trigger the listener for modified on the parent components:
-        this.modified = modify;
       },
       open: function() {
         this.saveOriginalData();
@@ -455,6 +493,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.personId = e.detail.option.id;
         this.email = e.detail.option.email;
         this.phoneMobile = e.detail.option.phoneMobile;
+      },
+      _eventCreatorError: function(e) {
+        // There are many different errors that can happen actually.
+        // This is probably different if UPDATING OR CREATING too.
+        var status = e.detail.request.status;
+        if (status) {
+          switch (status) {
+            case 400:
+              // Probably dates malformed:
+              this.warningMessage = 'Start and/or end time are invalid.';
+              break;
+            case 403:
+              this.warningMessage = 'Your session has expired. Please log back in.';
+              break;
+            default:
+              this.warningMessage = 'Service currently unavailable. Please try again later.';
+          }
+        } else {
+          this.warningMessage = 'Service currently unavailable. Please try again later.';
+        }
+      },
+      _eventCreatorResponse: function(e) {
+        // I should add the created event to the data property, which is chain-bound
+        // to the calendar.
+        if (e.detail.response.eventId > 0) {
+          // Check if this is a new event or not.
+          if (this.eventId > 0) {
+            // Existing event.
+            for (var i = 0; i < this.data.length; i++) {
+              if (this.data[i].eventId === this.eventId) {
+                this.data[i] = e.detail.response;
+                break;
+              }
+            }
+          } else {
+            // New event:
+            this.data.push(e.detail.response);
+            this.eventId = e.detail.response.eventId;
+          }
+          this.close();
+        } else {
+          this.warningMessage = 'Unexpected error trying to create event.';
+        }
       }
 
     });

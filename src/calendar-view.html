@@ -44,19 +44,21 @@ text-color="#ecf0f1"
 
     <calendar-appointment id="appoint"
       creds="{{creds}}"
-      baseApiUrl="baseApiUrl">
+      baseApiUrl="[[baseApiUrl]]"
+      data="{{events}}">
     </calendar-appointment>
     <!-- The scheduler-component doesn't support direct bindings very well, so
     I'm doing it in JS. -->
     <scheduler-component
       id="cal"
       default-view="agendaWeek"
-      events="[]"
+      events="[[events]]"
       locale="fr"
       on-event-click="showEvent"
       on-day-click="dayClickEvent"
       on-date-range-changed="dateRangeChanged"
-      on-view-render="calViewRendered">
+      on-view-render="calViewRendered"
+      min-time="06:00:00">
     </scheduler-component>
 
   </template>
@@ -102,6 +104,11 @@ text-color="#ecf0f1"
             type: Object,
             notify: true,
             value: {user: '', token: ''}
+          },
+          events: {
+            type: Array,
+            notify: true,
+            value: []
           }
         };
       }
@@ -154,9 +161,11 @@ text-color="#ecf0f1"
         // date range view change.
         var events = e.detail.response;
         if (events instanceof Array) {
-          this.$.cal.events = events;
+          //this.$.cal.events = events;
+          this.events = events;
         } else {
-          this.$.cal.events = [];
+          //this.$.cal.events = [];
+          this.events = [];
         }
         this.errorMessage = '';
         this.syncing = false;
@@ -189,7 +198,11 @@ text-color="#ecf0f1"
         this.$.appoint.clear();
         this.$.appoint.start = e.detail.date.clone();
         this.$.appoint.end = e.detail.date.clone().add(1, 'hours');
+        // This could be in some kind of "newAppointment function in
+        // the element itself.
         this.$.appoint.newAppointment = true;
+        this.$.appoint.personId = -1;
+        this.$.appoint.eventId = -1;
         this.$.appoint.edit();
       }
 
