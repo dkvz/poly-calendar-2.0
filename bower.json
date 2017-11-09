@@ -34,8 +34,7 @@
     "iron-a11y-keys-behavior": "^2.0.1",
     "paper-progress": "^2.0.1",
     "paper-dialog-scrollable": "^2.1.0",
-    "vaadin-combo-box": "vaadin/vaadin-combo-box#^3.0.1",
-    "vaadin-material-theme": "vaadin/vaadin-material-theme#^0.3.0"
+    "paper-autocomplete": "^3.4.0"
   },
   "resolutions": {
     "polymer": "^2.0.0",
@@ -52,7 +51,9 @@
     "paper-styles": "^2.0.0",
     "iron-a11y-keys-behavior": "^2.0.1",
     "iron-list": "^2.0.2",
-    "iron-resizable-behavior": "^2.0.0"
+    "iron-resizable-behavior": "^2.0.0",
+    "iron-icon": "^2.0.0",
+    "paper-ripple": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0"

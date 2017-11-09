@@ -118,7 +118,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       phone-mobile="{{phoneMobile}}"
       email="{{email}}"
       new-appointment="{{newAppointment}}"
-      person-id="{{personId}}">
+      person-id="{{personId}}"
+      creds="{{creds}}">
     </appointment-edit-dialog>
 
   </template>
@@ -212,6 +213,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Boolean,
           notify: true,
           value: false
+        },
+        creds: {
+          type: Object,
+          notify: true,
+          value: {user: '', token: ''}
         }
 
       },

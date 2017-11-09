@@ -22,10 +22,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../bower_components/vaadin-material-theme/vaadin-combo-box.html">
-<link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="../bower_components/paper-autocomplete/paper-autocomplete.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="person-details.html">
 <link rel="import" href="shared-styles.html">
 
@@ -41,17 +42,80 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <style is="custom-style" include="shared-styles"></style>
 
+    <iron-ajax id="autocompleter"
+      last-response={{autocompletePersons}}
+      handle-as="json"
+      loading="{{autocompleteLoading}}"
+      on-error="_autocompleterError"
+      on-response="_autocompleterResponse">
+    </iron-ajax>
+
     <!--<paper-dialog id="editDialog" no-cancel-on-outside-click no-cancel-on-esc-key always-on-top>-->
     <paper-dialog id="editDialog" modal always-on-top on-iron-overlay-opened="patchOverlay">
       <paper-dialog-scrollable>
         <div class="layout vertical">
           <h2>Editer le rendez-vous</h2>
           <template is="dom-if" if="{{warningMessage}}">
-            <div class="warning">{{warningMessage}}</div>
+            <div class="warning-message">{{warningMessage}}</div>
           </template>
-          <paper-input label="Nom" id="inputName" value="{{displayedName}}"></paper-input>
-          <div class="small">
+          <!-- <paper-input label="Nom" id="inputName" value="{{displayedName}}"></paper-input> -->
+          <!-- <vaadin-combo-box id="inputName" 
+            required label="Nom de la personne" 
+            value="{{displayedName}}"
+            allow-custom-value
+            items="[[autocompletePersons]]">
+          </vaadin-combo-box> -->
+          <paper-autocomplete id="inputName"
+            required
+            label="Nom de la personne" 
+            on-text-changed="_displayedNameTextChanged"
+            source="[[autocompletePersons.persons]]"
+            value-property="id"
+            text-property="lastname"
+            show-results-on-focus
+            on-autocomplete-selected="_autocompleteSelected">
+
+            <template slot="autocomplete-custom-template">
+              <!-- NOTICE: Due to shadow-dom, custom template styles need to be included with the template in Polymer 2.x -->
+              <style>
+                :host {
+                  display: block;
+                }
+                .bDate {
+                  font-size: 0.7em;
+                }
+                .sugg {
+                  padding-bottom: 4px;
+                }
+                /**
+                 * IE11 paper-item min-height bug: https://github.com/PolymerElements/paper-item/issues/35
+                 * If you are running on IE11, add this lines to reset min-height on IE11
+                 */
+                @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+                  paper-item.account-item {
+                    min-height: 100% !important;
+                    height: auto !important;
+                    /**
+                     * If you are experimenting that some CSS properties for paper-item are not overriden in Polymer 2.x with IE11,
+                     * please add !important to ensure the shadow-dom v1 polyfill works properly
+                     */
+                    padding: 8px 16px !important;
+                  }
+                }
+              </style>
+              <paper-item on-tap="_onSelect" id$="[[_getSuggestionId(index)]]" role="option" aria-selected="false">
+                <div class="sugg">
+                  <div>[[item.lastname]], [[item.firstname]]</div>
+                  <div class="bDate">Date de naissance: [[item.birthdate]]</div>
+                </div>
+                <paper-ripple></paper-ripple>
+              </paper-item>
+            </template>
+
+          </paper-autocomplete>
+          <div class="small horizontal center layout">
             <a href="#" on-tap="showEditPerson">Enregistrer cette personne...</a>
+            <paper-spinner-lite active="{{autocompleteLoading}}"></paper-spinner-lite>
           </div>
           <paper-input label="Localisation" id="inputLocation" value="{{location}}"></paper-input>
           <!--
@@ -84,7 +148,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-input maxlength="2" id="inputEndTimeM" no-label-float size="2" value="{{endTimeM}}"></paper-input>
           </div>
           <paper-input label="Téléphone mobile" id="inputPhoneMobile" value="{{phoneMobile}}"></paper-input>
-          <paper-input labal="Email" id="inputEmail" type="email" value="{{email}}"></paper-input>
+          <paper-input label="Email" id="inputEmail" type="email" value="{{email}}"></paper-input>
 
           <br />
           <div>Rappel:</div>
@@ -223,10 +287,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: String,
           value: 'cal/events'
         },
+        personApiUrl: {
+          type: String,
+          value: 'address-book/persons'
+        },
         personId: {
           type: Number,
           notify: true,
           value: -1
+        },
+        autocompletePersons: {
+          type: Object,
+          notify: true,
+          value: {'persons': []}
+        },
+        previousFirstLetter: {
+          type: String,
+          notify: false,
+          value: ''
+        },
+        autocompleteLoading: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+        creds: {
+          type: Object,
+          notify: true,
+          value: {user: '', token: ''}
         }
 
       },
@@ -248,6 +336,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       attached: function() {
         // This is only called once since we use just one of these
         // elements.
+        this.$.inputName.queryFn = this._queryfn;
       },
       _setDropdownPosition: function() {
         for (var i = 0; i < this.appointmentTypes.length; i++) {
@@ -297,7 +386,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       _clearBloc: function() {
         this.displayedName = '';
-        this.id = 0;
         this.color = 'white';
       },
       _initForm: function() {
@@ -305,6 +393,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.startTimeM = this.start.format('mm');
         this.endTimeH = this.end.format('HH');
         this.endTimeM = this.end.format('mm');
+        this.warningMessage = '';
       },
       showEditPerson: function() {
         this.$.personDetails.toggle();
@@ -314,6 +403,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       savePersonDetails: function() {
         this.$.personDetailsEl.save();
+      },
+      clearForm: function() {
+        this.personId = -1;
+        this.email = '';
+        this.phoneMobile = '';
+      },
+      _displayedNameTextChanged: function(e, p) {
+        // Check p.value to know what the "new" value is.
+        // We do nothing if it's an empty string.
+        // We do nothing unless the first letter changed (case insensitive change).
+        // We could strip spaces as well.
+        // Check if we had a person selected, reset the fields if not:
+        if (this.personId > 0) {
+          this.clearForm();
+        }
+        if (p.value && p.value.toString().charAt(0).toLowerCase() !== this.previousFirstLetter) {
+          // Throw in an AJAX request for the autocomplete.
+          var fletter = p.value.toString().charAt(0).toLowerCase();
+          this.$.autocompleter.url = this.baseApiUrl + this.personApiUrl + '/'
+            + 'starting-with/' + fletter;
+          this.previousFirstLetter = fletter;
+          this.$.autocompleter.headers = {
+            'Authorization': 'bearer ' + this.creds.token
+          };
+          this.$.autocompleter.generateRequest();
+        }
+      },
+      _autocompleterError: function(e) {
+        this.warningMessage = 'There was an error trying to fetch the address book' +
+          ', please refresh the page';
+      },
+      _queryfn: function(datasource, query) {
+        return datasource.filter(function (item) {
+          return (
+            item.lastname.toLowerCase().indexOf(query) != -1 || item.lastname.toLowerCase().indexOf(query) != -1
+          );
+        });
+      },
+      _autocompleterResponse: function(e) {
+        // This needs to re-trigger an action thingy on the auto-completer.
+        // I could also try setting the "remote datasource" thing.
+        // I could manually bind the data so that I can add a property that has 
+        // the firstname and lastname combined for display on the paper-autocompleter.
+        if (e.detail.response.persons && e.detail.response.persons.length) {
+          this.$.inputName.suggestions(this._queryfn(e.detail.response.persons, this.$.inputName.text));
+        }
+      },
+      _autocompleteSelected: function(e) {
+        // e.detail.option contains the selected person with all the details.
+        this.personId = e.detail.option.id;
+        this.email = e.detail.option.email;
+        this.phoneMobile = e.detail.option.phoneMobile;
       }
 
     });

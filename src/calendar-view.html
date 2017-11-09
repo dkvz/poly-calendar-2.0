@@ -42,7 +42,10 @@ text-color="#ecf0f1"
       on-error="calError">
     </iron-ajax>
 
-    <calendar-appointment id="appoint"></calendar-appointment>
+    <calendar-appointment id="appoint"
+      creds="{{creds}}"
+      baseApiUrl="baseApiUrl">
+    </calendar-appointment>
     <!-- The scheduler-component doesn't support direct bindings very well, so
     I'm doing it in JS. -->
     <scheduler-component
@@ -149,7 +152,7 @@ text-color="#ecf0f1"
         // I know I could bind this in the template but I'd rather not.
         // For the moment I'm erasing the current events array at every
         // date range view change.
-        var events = e.detail.response.events;
+        var events = e.detail.response;
         if (events instanceof Array) {
           this.$.cal.events = events;
         } else {

@@ -78,19 +78,57 @@ I had to add a script tag in the scheduler-component, this is the beginning of t
 </code>
 
 ===== Autocomplete for "person" =====
+
+==== Using paper-autocomplete ====
+Install it:
+```
+bower install --save paper-autocomplete
+```
+Add the import:
+```
+<link rel="import" href="../bower_components/paper-autocomplete/paper-autocomplete.html">
+```
+
+==== Historical ====
 I'm using this component:
 ```
 bower install --save vaadin/vaadin-material-theme vaadin/vaadin-combo-box
 ```
+
 Which requires two imports:
 ```
-<link rel="import" href="../bower_components/vaadin-material-theme/vaadin-combo-box.html">
+<!-- <link rel="import" href="../bower_components/vaadin-material-theme/vaadin-combo-box.html"> -->
 <link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
 ```
+The first file actually doesn't exist which is why I commented it out. I still think it can't hurt to install vaadin-material-theme. I guess it's the default theme.
 
 The documentation is here: https://vaadin.com/elements/vaadin-combo-box/
 
 We're going to need an iron-ajax dedicated to that component.
+
+To show the birthdate right after the person first and last name I'm going to need a custom display template:
+```
+<vaadin-combo-box items='[{"label": "Hydrogen", "value": "H"}]'>
+  <template>
+    [[index]]: [[item.label]] <b>[[item.value]</b>
+  </template>
+</vaadin-combo-box>
+```
+
+The value property is set to the toString of the selected item or what is written in the control.
+However, I'm going to need .getSelected() to find the actual item with full information.
+
+-> What happens if I select something, then enter my own value? What does getSelected() return?
+
+About events, "change" appears to be when someone selects or clear an existing list value, and "valueChanged" what we need. Will have to confirm.
+
+-> value-changed doesn't help, it's only called when the user leaves the combobox or presses enter (or selects something I suppose).
+-> Doesn't help as well. I need a listener on the bound value property, hoping that will work.
+
+Apparently there's no way to bind a text value change easily.
+Relevant: https://github.com/vaadin/vaadin-combo-box/issues/284
+
+We could bind the inner input element value and that would work. I'm switching to paper-autocomplete as it will also look better.
 
 ===== Other issues =====
   * Style des boutons "raised" ne fonctionne pas: c'est dû à l'utilisation d'une version de paper-styles < 2.0. Bien que la version 2+ soit dans bower.json, il faut apparemment manuellement faire un ''bower install paper-styles''.
@@ -111,5 +149,6 @@ We're going to need an iron-ajax dedicated to that component.
   * Permettre de submit le formulaire login avec Enter.
   * The calendar view should collapse earlier than it does. It's not going to look good on tablets right now.
   * In all the event edition stuff, the presence a valid eventId can replace the "newAppointment" boolean.
+  * The zones with <paper-dialog-scrollable> should be moved to not include the controls. But they still have to be a direct parent of the dialog.
   * BACKEND: add a parameter to token generation to make it long term or short term.
   * BACKEND: token generation POST request could return expires, not necessary for the app though.
