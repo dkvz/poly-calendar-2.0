@@ -12,9 +12,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-date-picker-item/paper-date-picker-item.html">
 <link rel="import" href="shared-styles.html">
 
@@ -36,6 +38,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
+    <iron-ajax id="personRequester"
+      url="[[baseApiUrl]][[personApiUrl]]"
+      handle-as="json"
+      on-error="personRequesterError"
+      on-response="personRequesterResponse">
+    </iron-ajax>
+
     <div class="layout vertical">
       <h2>Détails</h2>
       <template is="dom-if" if="{warningMessage}}">
@@ -44,7 +53,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <template is="dom-if" if="{{editMode}}">
         <paper-input label="Nom" value="{{lastName}}"></paper-input>
         <paper-input label="Prénom" value="{{firstName}}"></paper-input>
-        <paper-date-picker-item icon="icons:today" date="{{birthdate}}" date-format="ll" placeholder="Date de naissance">
+        <paper-date-picker-item icon="icons:today" 
+          date="{{birthdate}}" 
+          date-format="ll" 
+          placeholder="Date de naissance">
         </paper-date-picker-item>
         <paper-input label="Tél. Mobile" value="{{phoneMobile}}"></paper-input>
         <paper-input label="Tél. Domicile" value="{{phoneHome}}"></paper-input>
@@ -169,6 +181,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
       },
+      loadPerson: function() {
+        if (this.personId > 0) {
+          
+        }
+      },
       attached: function() {
 
       },
@@ -177,6 +194,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         
       },
       cancel: function() {
+
+      },
+      personRequesterError: function(e) {
+
+      },
+      personRequesterResponse: function(e) {
 
       }
 

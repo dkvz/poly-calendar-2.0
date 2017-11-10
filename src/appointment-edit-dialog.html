@@ -458,7 +458,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.warningMessage = '';
       },
       showEditPerson: function() {
+        // The person might not be in the autocomplete collection.
+        // This is always the case if we open an event with a 
+        // registered person in.
+        // I should probably always refresh the person object anyway.
         this.$.personDetails.toggle();
+        
       },
       cancelPersonDetails: function() {
         this.$.personDetails.close();
