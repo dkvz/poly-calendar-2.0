@@ -61,6 +61,8 @@ text-color="#ecf0f1"
       min-time="06:00:00">
     </scheduler-component>
 
+    <paper-button on-tap="doesItWork">DONT CLICK</paper-button>
+
   </template>
 
   <script>
@@ -128,7 +130,7 @@ text-color="#ecf0f1"
       }
 
       doesItWork() {
-        this.$.appoint.showDetails();
+        console.log(this.events);
       }
 
       showEvent(e) {

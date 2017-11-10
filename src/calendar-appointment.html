@@ -72,9 +72,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <p>
           <b>Ending at:&nbsp;</b>{{endTime}}
         </p>
-        <p>
+        <!-- <p>
           <b>Type:&nbsp;</b>{{type}}
-        </p>
+        </p> -->
         <p>
           <template is="dom-if" if="{{location}}">
             <b>Localisation:&nbsp;</b>{{location}}
@@ -103,10 +103,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <appointment-edit-dialog
       id="editDialog"
       event-id="{{eventId}}"
-      date="[[date]]"
       displayed-name="{{displayedName}}"
       location="{{location}}"
       start="{{start}}"
+      date="{{start}}"
       end="{{end}}"
       data="{{data}}"
       modified="{{modified}}"

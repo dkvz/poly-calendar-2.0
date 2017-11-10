@@ -22,6 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
@@ -58,6 +59,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       method="POST"
       on-error="_eventCreatorError"
       on-response="_eventCreatorResponse">
+    </iron-ajax>
+
+    <iron-ajax id="eventDeleter"
+      handle-as="json"
+      loading="{{syncing}}"
+      url="[[baseApiUrl]][[eventApiUrl]]/[[eventId]]"
+      method="DELETE"
+      on-error="_eventCreatorError"
+      on-response="_eventDeleterResponse">
     </iron-ajax>
 
     <!--<paper-dialog id="editDialog" no-cancel-on-outside-click no-cancel-on-esc-key always-on-top>-->
@@ -189,6 +199,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
     </paper-dialog>
 
+    <paper-dialog id="confirmDialog" modal always-on-top>
+      <h2>Event deletion</h2>
+      <div>You are about to delete the current event.<br />Are you sure?</div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm autofocus on-tap="_confirmDeletion">Yes</paper-button>
+      </div>
+    </paper-dialog>
+
   </template>
 
   <script>
@@ -209,7 +228,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           value: -1
         },
         date: {
-          type: String,
+          type: Object,
           notify: true
         },
         start: {
@@ -231,7 +250,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         data: {
           type: Array,
           notify: true
-        }
+        },
         type: {
           type: String,
           notify: true
@@ -344,7 +363,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var reqBody = {
               'start': this.startTimeH + ':' + this.startTimeM,
               'end': this.endTimeH + ':' + this.endTimeM,
-              'date': this.date.format('DD/MM/YYYY'),
+              'date': this.date.format('YYYY-MM-DD'),
               'displayedName': this.displayedName,
               'location': this.location,
               'reminderEmail': this.reminderEmail,
@@ -402,8 +421,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
       },
       remove: function() {
-
-        this.close();
+        if (this.eventId > 0) {
+          this.$.confirmDialog.open();
+        }
       },
       open: function() {
         this.saveOriginalData();
@@ -523,19 +543,65 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             // Existing event.
             for (var i = 0; i < this.data.length; i++) {
               if (this.data[i].eventId === this.eventId) {
-                this.data[i] = e.detail.response;
+                //this.data[i] = e.detail.response;
+                // To notify Polymer of the array mutations we need
+                // to splice then push:
+                //this.splice('data', i, 1);
+                //this.push('data', e.detail.response);
+                // Because of scheduler-component I need this workaround:
+                var copy = this.data;
+                copy[i] = e.detail.response;
+                // [] seems to clear the reference but not affect the object
+                // corresponding to the other reference. I hope this works
+                // with all browsers. I could use splice(0) to actually
+                // clone the entire array.
+                this.data = [];
+                this.data = copy;
                 break;
               }
             }
           } else {
             // New event:
-            this.data.push(e.detail.response);
+            //this.data.push(e.detail.response);
+            //this.push('data', e.detail.response);
             this.eventId = e.detail.response.eventId;
+            // Because of scheduler-component I need this workaround:
+            // (not sure it works on every browser)
+            var copy = this.data;
+            copy.push(e.detail.response);
+            this.data = [];
+            this.data = copy;
           }
           this.close();
         } else {
           this.warningMessage = 'Unexpected error trying to create event.';
         }
+      },
+      _eventDeleterResponse: function(e) {
+        // Look for 'result': 'OK'
+        if (e.detail.response.result) {
+          // We need to remove the item from the data collection:
+          for (var i = 0; i < this.data.length; i++) {
+            if (this.data[i].eventId === this.eventId) {
+              //this.data.splice(i, 1);
+              // Horrible workaround due to scheduluer component:
+              var copy = this.data;
+              copy.splice(i, 1);
+              this.data = [];
+              this.data = copy;
+              break;
+            }
+          }
+          this.close();
+        } else {
+          this.warningMessage = 'Unexpected error trying to delete event.';
+        }        
+      },
+      _confirmDeletion: function() {
+        this.$.eventDeleter.headers = {
+          'Authorization': 'bearer ' + this.creds.token
+        };
+        this.$.eventDeleter.generateRequest();
       }
 
     });
