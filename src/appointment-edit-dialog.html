@@ -191,7 +191,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <paper-dialog id="personDetails" modal always-on-top>
       <paper-dialog-scrollable>
-        <person-details id="personDetailsEl" edit-mode first-name="Test name" last-name="Test last name"></person-details>
+        <person-details id="personDetailsEl" 
+          person-id="{{personId}}"
+          base-api-url="[[baseApiUrl]]"
+          edit-mode>
+        </person-details>
       </paper-dialog-scrollable>
       <div class="layout horizontal end-justified" style="margin-top: 0">
         <paper-icon-button icon="save" title="Save" on-tap="savePersonDetails"></paper-icon-button>
@@ -460,6 +464,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.personDetails.close();
       },
       savePersonDetails: function() {
+        // We should update the email and mobilePhone on the calling dialog.
+        // TODO
+
+
+
+        
         this.$.personDetailsEl.save();
       },
       clearForm: function() {
@@ -595,7 +605,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.close();
         } else {
           this.warningMessage = 'Unexpected error trying to delete event.';
-        }        
+        }
       },
       _confirmDeletion: function() {
         this.$.eventDeleter.headers = {

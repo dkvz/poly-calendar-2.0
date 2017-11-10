@@ -28,10 +28,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           margin: 0;
         };
       }
-      .diag {
-        padding: 4px 24px 4px 24px;
-        margin: 0;
-      }
       h2 {
         margin-bottom: 0;
       }
@@ -40,7 +36,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
-    <div class="layout vertical diag">
+    <div class="layout vertical">
       <h2>Détails</h2>
       <template is="dom-if" if="{warningMessage}}">
         <div class="warning">{{warningMessage}}</div>
@@ -121,6 +117,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           notify: true,
           value: ''
         },
+        personId: {
+          type: Number,
+          notify: true,
+          value: -1
+        },
         lastName: {
           type: String,
           notify: true
@@ -133,13 +134,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Date,
           notify: true
         },
-        language: {
+        phoneMobile: {
           type: String,
           notify: true
         },
+        phoneWork: {
+          type: String,
+          notify: false
+        },
+        phoneHome: {
+          type: String,
+          notify: false
+        },
+        email: {
+          type: String,
+          notify: true
+        },
+        language: {
+          type: String,
+          notify: false
+        },
+        languageId: {
+          type: Number,
+          notify: true,
+          value: 0
+        },
         baseApiUrl: {
           type: String,
-          value: 'http://localhost/v1/'
+          value: 'http://api.croutte.net/v1/'
         },
         personApiUrl: {
           type: String,
@@ -147,13 +169,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
       },
-      save: function() {
-        console.log('Saving the details about this person.');
-      },
-      cancel: function() {
+      attached: function() {
 
       },
-      attached: function() {
+      save: function() {
+        console.log('Saving the details about this person.');
+        
+      },
+      cancel: function() {
 
       }
 
