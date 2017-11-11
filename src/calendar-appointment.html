@@ -29,7 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 
-    <style include="iron-flex iron-flex-alignment">
+    <style include="iron-flex iron-flex-alignment shared-styles">
       #appoint {
         border: var(--appointment-border-bottom, 4px solid silver);
         margin: 0;
@@ -38,7 +38,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       .location {
         text-align: right;
-        font-weight: bolder
+        font-weight: bolder;
       }
       /*.dialog {
         overflow: auto;
@@ -50,29 +50,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }*/
     </style>
 
-    <style is="custom-style" include="shared-styles"></style>
-
     <paper-dialog id="personDetails">
-        <paper-dialog-scrollable>
-          <person-details id="personDetailsEl" 
-            edit-mode="{{personEditMode}}" 
-            first-name="Test name" 
-            last-name="Test last name">
-          </person-details>
-        </paper-dialog-scrollable>
-        <template is="dom-if" if="{{personEditMode}}">
-          <div class="layout horizontal end-justified" style="margin-top: 0">
-            <paper-icon-button icon="save" title="Save" on-tap="savePersonDetails"></paper-icon-button>
-            <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
-          </div>
-        </template>
-        <template is="dom-if" if="{{!personEditMode}}">
-          <div class="layout horizontal end-justified" style="margin-top: 0">
-            <paper-icon-button icon="image:edit" title="Edit" on-tap="editPersonDetails"></paper-icon-button>
-            <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
-          </div>
-        </template>
-      </paper-dialog>
+      <paper-dialog-scrollable>
+        <person-details id="personDetailsEl" 
+          edit-mode="{{personEditMode}}" 
+          first-name="Test name" 
+          last-name="Test last name">
+        </person-details>
+      </paper-dialog-scrollable>
+      <hr width="100%" />
+      <template is="dom-if" if="{{personEditMode}}">
+        <div class="layout horizontal end-justified" style="margin-top: 0">
+          <paper-icon-button icon="save" title="Save" on-tap="savePersonDetails"></paper-icon-button>
+          <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
+        </div>
+      </template>
+      <template is="dom-if" if="{{!personEditMode}}">
+        <div class="layout horizontal end-justified" style="margin-top: 0">
+          <paper-icon-button icon="image:edit" title="Edit" on-tap="editPersonDetails"></paper-icon-button>
+          <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
+        </div>
+      </template>
+    </paper-dialog>
 
     <!-- The with-backdrop option makes the background darker when dialog is shown, not sure if it makes it modal -->
     <paper-dialog class="dialog" id="details" no-overlap entry-animation="scale-up-animation" exit-animation="fade-out-animation">
