@@ -40,9 +40,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         text-align: right;
         font-weight: bolder
       }
-      .dialog {
+      /*.dialog {
         overflow: auto;
-      }
+      }*/
       /*paper-fab {
         position: absolute;
         right: 6px;
@@ -51,6 +51,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <style is="custom-style" include="shared-styles"></style>
+
+    <paper-dialog id="personDetails">
+        <paper-dialog-scrollable>
+          <person-details id="personDetailsEl" 
+            edit-mode="{{personEditMode}}" 
+            first-name="Test name" 
+            last-name="Test last name">
+          </person-details>
+        </paper-dialog-scrollable>
+        <template is="dom-if" if="{{personEditMode}}">
+          <div class="layout horizontal end-justified" style="margin-top: 0">
+            <paper-icon-button icon="save" title="Save" on-tap="savePersonDetails"></paper-icon-button>
+            <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
+          </div>
+        </template>
+        <template is="dom-if" if="{{!personEditMode}}">
+          <div class="layout horizontal end-justified" style="margin-top: 0">
+            <paper-icon-button icon="image:edit" title="Edit" on-tap="editPersonDetails"></paper-icon-button>
+            <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
+          </div>
+        </template>
+      </paper-dialog>
 
     <!-- The with-backdrop option makes the background darker when dialog is shown, not sure if it makes it modal -->
     <paper-dialog class="dialog" id="details" no-overlap entry-animation="scale-up-animation" exit-animation="fade-out-animation">
@@ -85,21 +107,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </p>
       </paper-dialog-scrollable>
     </paper-dialog>
-    <paper-dialog class="dialog" id="personDetails">
-      <person-details id="personDetailsEl" edit-mode="{{personEditMode}}" first-name="Test name" last-name="Test last name"></person-details>
-      <template is="dom-if" if="{{personEditMode}}">
-        <div class="layout horizontal end-justified" style="margin-top: 0">
-          <paper-icon-button icon="save" title="Save" on-tap="savePersonDetails"></paper-icon-button>
-          <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
-        </div>
-      </template>
-      <template is="dom-if" if="{{!personEditMode}}">
-        <div class="layout horizontal end-justified" style="margin-top: 0">
-          <paper-icon-button icon="image:edit" title="Edit" on-tap="editPersonDetails"></paper-icon-button>
-          <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
-        </div>
-      </template>
-    </paper-dialog>
+    
     <appointment-edit-dialog
       id="editDialog"
       event-id="{{eventId}}"
@@ -253,6 +261,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       editPersonDetails: function() {
         this.personEditMode = true;
+        this.$.personDetails.close();
+        this.$.personDetails.open();
       },
       computeDate: function(date) {
         //return date.day() + '/' + date.month() + '/' + date.year();

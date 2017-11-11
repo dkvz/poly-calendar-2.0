@@ -8,7 +8,6 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
@@ -16,25 +15,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
-<link rel="import" href="../bower_components/paper-date-picker-item/paper-date-picker-item.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="person-details">
 
   <template>
 
-    <style include="iron-flex iron-flex-alignment shared-styles">
+    <style include="shared-styles">
       :host {
         --paper-input-container: {
           margin: 0;
         };
       }
-      h2 {
-        margin-bottom: 0;
+      .main paper-input,
+      .main paper-dropdown-menu {
+        display: block;
+        --paper-input-container: {
+          font-size: 0.8em;
+          padding-top: 0px;
+          padding-bottom: 0px;
+        };
       }
-      paper-date-picker-item {
-        margin-top: 10px;
+      .form-controls {
+        float: right;
       }
     </style>
 
@@ -45,32 +51,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       on-response="personRequesterResponse">
     </iron-ajax>
 
-    <div class="layout vertical">
+    <div class="main">
       <h2>Détails</h2>
-      <template is="dom-if" if="{warningMessage}}">
-        <div class="warning">{{warningMessage}}</div>
-      </template>
+      <!--<template is="dom-if" if="{warningMessage}}">
+        <div class="warning-message">{{warningMessage}}</div>
+      </template>-->
       <template is="dom-if" if="{{editMode}}">
         <paper-input label="Nom" value="{{lastName}}"></paper-input>
         <paper-input label="Prénom" value="{{firstName}}"></paper-input>
-        <paper-date-picker-item icon="icons:today" 
-          date="{{birthdate}}" 
-          date-format="ll" 
-          placeholder="Date de naissance">
-        </paper-date-picker-item>
-        <paper-input label="Tél. Mobile" value="{{phoneMobile}}"></paper-input>
-        <paper-input label="Tél. Domicile" value="{{phoneHome}}"></paper-input>
-        <paper-input label="Tél. Bureau" value="{{phoneWork}}"></paper-input>
-        <paper-input label="Email" value="{{email}}"></paper-input>
-        <paper-dropdown-menu label="Langue">
+        <paper-input label="Date de naissance" type="date" value="{{birthdate}}"></paper-input>
+        <!--<paper-dropdown-menu label="Langue">
           <paper-listbox class="dropdown-content" selected="0">
             <paper-item>Français</paper-item>
             <paper-item>Néerlandais</paper-item>
             <paper-item>Anglais</paper-item>
           </paper-listbox>
-        </paper-dropdown-menu>
+        </paper-dropdown-menu>-->
+        <paper-dropdown-menu-light label="Langue">
+          <paper-listbox slot="dropdown-content" class="dropdown-content">
+            <paper-item>Français</paper-item>
+            <paper-item>Néerlandais</paper-item>
+            <paper-item>Anglais</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu-light>
+        <paper-input label="Tél. Mobile" value="{{phoneMobile}}"></paper-input>
+        <paper-input label="Tél. Domicile" value="{{phoneHome}}"></paper-input>
+        <paper-input label="Tél. Bureau" value="{{phoneWork}}"></paper-input>
+        <paper-input label="Email" value="{{email}}"></paper-input>
         <template is="dom-if" if="{{editControls}}">
-          <div class="layout horizontal end-justified">
+          <div class="form-controls">
             <paper-icon-button icon="save" title="Save" on-tap="save"></paper-icon-button>
             <paper-icon-button icon="cancel" title="Cancel" on-tap="cancel"></paper-icon-button>
           </div>
