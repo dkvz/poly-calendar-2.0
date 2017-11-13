@@ -55,10 +55,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <iron-ajax id="personRequester"
-      url="[[baseApiUrl]][[personApiUrl]]"
       handle-as="json"
       on-error="personRequesterError"
-      on-response="personRequesterResponse">
+      on-response="personRequesterResponse"
+      loading="{{loading}}">
     </iron-ajax>
 
     <div class="main">
@@ -66,9 +66,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h2>Détails</h2>
       <div class="warning-message" hidden$="{{!warningMessage}}">{{warningMessage}}</div>
       <template is="dom-if" if="{{editMode}}">
-        <paper-input label="Nom" value="{{lastName}}"></paper-input>
-        <paper-input label="Prénom" value="{{firstName}}"></paper-input>
-        <paper-input label="Date de naissance" type="date" value="{{birthdate}}"></paper-input>
+        <paper-input label="Nom" value="{{lastName}}" disabled="{{loading}}"></paper-input>
+        <paper-input label="Prénom" value="{{firstName}}" disabled="{{loading}}"></paper-input>
+        <paper-input label="Date de naissance" type="date" value="{{birthdate}}" disabled="{{loading}}"></paper-input>
         <!--<paper-dropdown-menu label="Langue">
           <paper-listbox class="dropdown-content" selected="0">
             <paper-item>Français</paper-item>
@@ -76,17 +76,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-item>Anglais</paper-item>
           </paper-listbox>
         </paper-dropdown-menu>-->
-        <paper-dropdown-menu-light label="Langue">
-          <paper-listbox slot="dropdown-content" class="dropdown-content">
+        <paper-dropdown-menu-light label="Langue" disabled="{{loading}}">
+          <paper-listbox slot="dropdown-content" class="dropdown-content" selected={{languageId}}>
             <paper-item>Français</paper-item>
             <paper-item>Néerlandais</paper-item>
             <paper-item>Anglais</paper-item>
           </paper-listbox>
         </paper-dropdown-menu-light>
-        <paper-input label="Tél. Mobile" value="{{phoneMobile}}"></paper-input>
-        <paper-input label="Tél. Domicile" value="{{phoneHome}}"></paper-input>
-        <paper-input label="Tél. Bureau" value="{{phoneWork}}"></paper-input>
-        <paper-input label="Email" value="{{email}}"></paper-input>
+        <paper-input label="Tél. Mobile" value="{{phoneMobile}}" disabled="{{loading}}"></paper-input>
+        <paper-input label="Tél. Domicile" value="{{phoneHome}}" disabled="{{loading}}"></paper-input>
+        <paper-input label="Tél. Bureau" value="{{phoneWork}}" disabled="{{loading}}"></paper-input>
+        <paper-input label="Email" value="{{email}}" disabled="{{loading}}"></paper-input>
         <template is="dom-if" if="{{editControls}}">
           <div class="form-controls">
             <paper-icon-button icon="save" title="Save" on-tap="save"></paper-icon-button>
@@ -131,6 +131,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     Polymer({
 
       is: 'person-details',
+
+      /**
+      * @event created-or-modified
+      **/
 
       properties: {
 
@@ -203,12 +207,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         personApiUrl: {
           type: String,
           value: 'address-book/persons'
+        },
+        updatingOrCreating: {
+          type: Boolean,
+          notify: true,
+          value: false
         }
 
       },
       loadPerson: function() {
         if (this.personId > 0) {
-          
+          this.updatingOrCreating = false;
+          this.$.personRequester.url = this.baseApiUrl + this.personApiUrl + 
+            '/' + personId;
+          this.$.personRequester.headers = {
+            'Authorization': 'bearer ' + this.creds.token
+          };
+          this.$.personRequester.method = 'GET';
+          this.$.generateRequest();
         }
       },
       attached: function() {
@@ -216,16 +232,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       save: function() {
         console.log('Saving the details about this person.');
+
+        this.updatingOrCreating = true;
         
       },
       cancel: function() {
 
       },
       personRequesterError: function(e) {
-
+        var status = e.detail.request.status;
+        if (status) {
+          switch (status) {
+            case 400:
+              // Probably dates malformed:
+              this.warningMessage = 'Invalid request, please try again.';
+              break;
+            case 403:
+              this.warningMessage = 'Your session has expired. Please log back in.';
+              break;
+            default:
+              this.warningMessage = 'Service currently unavailable. Please try again later.';
+          }
+        } else {
+          this.warningMessage = 'Service currently unavailable. Please try again later.';
+        }
       },
       personRequesterResponse: function(e) {
-
+        // We actually don't really care about the response.
+        // We could just light up some kind of "Saved" badge or something.
+        if (!this.updatingOrCreating) {
+          this.setProperties({
+            'lastName': e.detail.response.lastname,
+            'firstName': e.detail.response.firstName,
+            'birthdate': e.detail.response.date,
+            'personId': e.detail.response.personId,
+            'phoneMobile': e.detail.response.phoneMobile,
+            'phoneHome': e.detail.response.phoneHome,
+            'phoneWork': e.detail.response.phoneWork,
+            'email': e.detail.response.email,
+            'languageId': e.detail.response.languageId
+          });
+        }
+        //this.fire('response');
+        this.dispatchEvent(new CustomEvent(
+          'created-or-modified', {detail: e.detail.response}
+        ));
+        this.warningMessage = '';
       }
 
     });
