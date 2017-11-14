@@ -220,6 +220,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.updatingOrCreating = false;
           this.$.personRequester.url = this.baseApiUrl + this.personApiUrl + 
             '/' + personId;
+          this.$.personRequester.contentType = null;
           this.$.personRequester.headers = {
             'Authorization': 'bearer ' + this.creds.token
           };
@@ -231,8 +232,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       },
       save: function() {
-        console.log('Saving the details about this person.');
+        // Check if the birthdate is valid first.
+        // It can be empty I guess.
+        // If the input type "date" exists for the browser
+        // the date will always be valid but in format
+        // YYYY-MM-DD
+        var reg = /\d{1,2}\/\d{1,2}\/\d{4}/;
+        if (this.birthdate.indexOf('-') > 0) {
+          bDate = new Date(this.birthdate);
+        } else if (this.birthdate.match(reg)) {
+          // Possibly valid date.
+          
+        }
+        
+        if (isNaN(bDate.getTime())) {
+          this.warningMessage = 'Invalid birth date, please leave empty '
+            + 'or use format dd/mm/yyyy.';
+        }
 
+        this.$.personRequester.method = 'POST';
+        this.$.personRequseter.url = this.baseApiUrl + this.personApiUrl;
+        this.$.personRequester.headers = {
+          'Authorization': 'bearer ' + this.creds.token
+        };
+        this.$.personRequester.contentType = 'application/json';
+        var body = {
+          'firstname': this.firstName,
+          'lastname': this.lastName,
+
+        };
+        if (this.personId > 0) {
+          body.personId = this.personId;
+        }
         this.updatingOrCreating = true;
         
       },
