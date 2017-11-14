@@ -68,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <template is="dom-if" if="{{editMode}}">
         <paper-input label="Nom" value="{{lastName}}" disabled="{{loading}}"></paper-input>
         <paper-input label="Prénom" value="{{firstName}}" disabled="{{loading}}"></paper-input>
-        <paper-input label="Date de naissance" type="date" value="{{birthdate}}" disabled="{{loading}}"></paper-input>
+        <paper-input label="Date de naissance" value="{{birthdate}}" disabled="{{loading}}"></paper-input>
         <!--<paper-dropdown-menu label="Langue">
           <paper-listbox class="dropdown-content" selected="0">
             <paper-item>Français</paper-item>
@@ -103,7 +103,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <td class="labels">Prénom:</td><td>{{firstName}}</td>
           </tr>
           <tr>
-            <td class="labels">Date de naissance:</td><td>{{birthday}}</td>
+            <td class="labels">Date de naissance:</td><td>{{birthdate}}</td>
           </tr>
           <tr>
             <td class="labels">Tél. Mobile:</td><td>{{phoneMobile}}</td>
@@ -134,6 +134,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       /**
       * @event created-or-modified
+      **/
+
+      /**
+      * @event deleted
       **/
 
       properties: {
@@ -167,7 +171,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           notify: true
         },
         birthdate: {
-          type: Date,
+          type: String,
           notify: true
         },
         phoneMobile: {
@@ -212,6 +216,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Boolean,
           notify: true,
           value: false
+        },
+        creds: {
+          type: Object,
+          notify: true,
+          value: {user: '', token: ''}
         }
 
       },
@@ -219,13 +228,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (this.personId > 0) {
           this.updatingOrCreating = false;
           this.$.personRequester.url = this.baseApiUrl + this.personApiUrl + 
-            '/' + personId;
+            '/' + this.personId;
           this.$.personRequester.contentType = null;
           this.$.personRequester.headers = {
             'Authorization': 'bearer ' + this.creds.token
           };
           this.$.personRequester.method = 'GET';
-          this.$.generateRequest();
+          this.$.personRequester.generateRequest();
         }
       },
       attached: function() {
@@ -237,38 +246,66 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // If the input type "date" exists for the browser
         // the date will always be valid but in format
         // YYYY-MM-DD
-        var reg = /\d{1,2}\/\d{1,2}\/\d{4}/;
+        if (this.loading) return;
+        var reg = /(\d{1,2})\/(\d{1,2})\/(\d{4})/;
+        var bDate;
         if (this.birthdate.indexOf('-') > 0) {
+          console.log('Found a date with dashes in it.');
           bDate = new Date(this.birthdate);
-        } else if (this.birthdate.match(reg)) {
-          // Possibly valid date.
-          
+        } else {
+          var matches = reg.exec(this.birthdate);
+          if (matches.length === 4) {
+            bDate = new Date(matches[3], Number(matches[2])-1, matches[1]);
+          }
         }
-        
-        if (isNaN(bDate.getTime())) {
+        if (!bDate || isNaN(bDate.getTime())) {
           this.warningMessage = 'Invalid birth date, please leave empty '
             + 'or use format dd/mm/yyyy.';
+            return;
         }
-
         this.$.personRequester.method = 'POST';
-        this.$.personRequseter.url = this.baseApiUrl + this.personApiUrl;
+        this.$.personRequester.url = this.baseApiUrl + this.personApiUrl;
         this.$.personRequester.headers = {
           'Authorization': 'bearer ' + this.creds.token
         };
         this.$.personRequester.contentType = 'application/json';
+        var month = bDate.getMonth() - 1;
         var body = {
           'firstname': this.firstName,
           'lastname': this.lastName,
-
+          'birthdate': bDate.getFullYear() + '-' + month 
+            + '-' + bDate.getDay(),
+          'phoneMobile': this.phoneMobile,
+          'phoneWork': this.phoneWork,
+          'phoneHome': this.phoneHome,
+          'email': this.email,
+          'languageId': this.languageId
         };
         if (this.personId > 0) {
           body.personId = this.personId;
         }
         this.updatingOrCreating = true;
-        
+        this.$.personRequester.body = body;
+        this.$.personRequester.generateRequest();
       },
       cancel: function() {
-
+        // TODO
+        // Not sure what I want this to do yet. Reload the person?
+      },
+      removePerson() {
+        // Careful that deleting a person cascades a whole bunch of things.
+        // We should probably keep that for a specific person list page.
+        if (this.personId > 0 && !this.loading) {
+          this.$.personRequester.method = 'DELETE';
+          this.$.personRequester.url = this.baseApiUrl + this.personApiUrl 
+            + '/' + this.personId;
+          this.$.contentType = null;
+          this.$.personRequester.headers = {
+            'Authorization': 'bearer ' + this.creds.token
+          };
+          this.updatingOrCreating = true;
+          this.$.personRequester.generateRequest();
+        }
       },
       personRequesterError: function(e) {
         var status = e.detail.request.status;
@@ -292,22 +329,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // We actually don't really care about the response.
         // We could just light up some kind of "Saved" badge or something.
         if (!this.updatingOrCreating) {
+          var bDate = null;
+          if (e.detail.response.birthdate && e.detail.response.birthdate !== '') {
+            bDate = e.detail.response.birthdate.substring(8,10) + '/' +
+              e.detail.response.birthdate.substring(5,7) + '/' + 
+              e.detail.response.birthdate.substring(0,4);
+          }
           this.setProperties({
             'lastName': e.detail.response.lastname,
-            'firstName': e.detail.response.firstName,
-            'birthdate': e.detail.response.date,
-            'personId': e.detail.response.personId,
+            'firstName': e.detail.response.firstname,
+            'birthdate': bDate,
             'phoneMobile': e.detail.response.phoneMobile,
             'phoneHome': e.detail.response.phoneHome,
             'phoneWork': e.detail.response.phoneWork,
             'email': e.detail.response.email,
             'languageId': e.detail.response.languageId
           });
+          return;
         }
-        //this.fire('response');
-        this.dispatchEvent(new CustomEvent(
-          'created-or-modified', {detail: e.detail.response}
-        ));
+        if (e.detail.response.result) {
+          this.dispatchEvent(new CustomEvent(
+            'deleted', {detail: e.detail.response}
+          ));
+        } else {
+          //this.fire('response');
+          this.dispatchEvent(new CustomEvent(
+            'created-or-modified', {detail: e.detail.response}
+          ));
+        }
         this.warningMessage = '';
       }
 

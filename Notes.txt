@@ -156,5 +156,6 @@ We could bind the inner input element value and that would work. I'm switching t
   * Minimum and maximum day times could be configurable somewhere. It's min-time and max-time on the scheduler-component.
   * We should probably disable the form or the save button or something when we're saving the data from the appointment-edit-dialog. What I'm going to do now is check if the iron-ajax is loading before making the request.
   * We need to be able to close the dialogs with escape, although it might do by default if I update my uses of the dialog to 2.0? If that's not already the case.
+  * When we got the type="date" input supported (like in Chrome), I'm not sure the birthdate will be set the right way.
   * BACKEND: add a parameter to token generation to make it long term or short term.
   * BACKEND: token generation POST request could return expires, not necessary for the app though.

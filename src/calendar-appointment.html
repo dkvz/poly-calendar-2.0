@@ -54,8 +54,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-dialog-scrollable>
         <person-details id="personDetailsEl" 
           edit-mode="{{personEditMode}}" 
-          first-name="Test name" 
-          last-name="Test last name">
+          person-id="{{personId}}"
+          creds="{{creds}}"
+          on-created-or-modified="personOperationCompleted">
         </person-details>
       </paper-dialog-scrollable>
       <hr width="100%" />
@@ -249,6 +250,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       showPersonDetails: function() {
         //this.$.personDetails.positionTarget = this.$.detailsLink;
+        this.$.personDetailsEl.loadPerson();
         this.$.personDetails.toggle();
       },
       savePersonDetails: function() {
@@ -260,6 +262,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       editPersonDetails: function() {
         this.personEditMode = true;
+        // I need this weird hack to set the size right.
         this.$.personDetails.close();
         this.$.personDetails.open();
       },
@@ -276,6 +279,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.newAppointment = false;
         this.personId = 0;
         this.displayedName = '';
+      },
+      personOperationCompleted: function(e) {
+        this.$.personDetails.close();
+        this.displayedName = e.detail.lastname + ' ' +
+          e.detail.firstname;
+        this.personEditMode = false;
       }
 
     });
