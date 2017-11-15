@@ -194,7 +194,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <person-details id="personDetailsEl" 
           person-id="{{personId}}"
           base-api-url="[[baseApiUrl]]"
-          edit-mode>
+          edit-mode
+          person-id="{{personId}}"
+          creds="{{creds}}"
+          on-created-or-modified="_personOperationCompleted">
         </person-details>
       </paper-dialog-scrollable>
       <div class="layout horizontal end-justified" style="margin-top: 0">
@@ -462,19 +465,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // This is always the case if we open an event with a 
         // registered person in.
         // I should probably always refresh the person object anyway.
+        if (this.personId > 0) {
+          this.$.personDetailsEl.loadPerson();
+        } else {
+          this.$.personDetailsEl.lastName = this.displayedName;
+        }
         this.$.personDetails.toggle();
-        
       },
       cancelPersonDetails: function() {
         this.$.personDetails.close();
       },
       savePersonDetails: function() {
         // We should update the email and mobilePhone on the calling dialog.
-        // TODO
-
-
-
-        
+        // This is to be done in the response event.
         this.$.personDetailsEl.save();
       },
       clearForm: function() {
@@ -617,6 +620,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'Authorization': 'bearer ' + this.creds.token
         };
         this.$.eventDeleter.generateRequest();
+      },
+      _personOperationCompleted: function(e) {
+        // WARNING: We might have changed the name here, which should trigger 
+        // a new displayName, which will trigger the autocomplete event.
+        // The autocomplete event clears personId. And email etc. as well.
+        // Also we may have created a new person here.
+        if (e.detail.personId > 0 && e.detail.personId !== this.personId) {
+          // We created a new user.
+          this.personId = e.detail.personId;
+        }
+        this.email = e.detail.email;
+        this.phoneMobile = e.detail.phoneMobile;
+        var nDisplayName = e.detail.lastname + ' ' + e.detail.firstname;
+        (this.displayedName !== nDisplayName) && (this.displayedName = nDisplayName);
+        this.$.personDetails.close();
       }
 
     });

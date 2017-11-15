@@ -31,6 +31,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           margin: 0;
         };
       }
+      .main {
+        padding-bottom: 10px;
+      }
       .main paper-input,
       .main paper-dropdown-menu {
         display: block;
@@ -192,7 +195,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         language: {
           type: String,
-          notify: false
+          computed: '_getLanguageString()'
         },
         languageId: {
           type: Number,
@@ -227,6 +230,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       loadPerson: function() {
         if (this.personId > 0) {
           this.updatingOrCreating = false;
+          this.clear();
           this.$.personRequester.url = this.baseApiUrl + this.personApiUrl + 
             '/' + this.personId;
           this.$.personRequester.contentType = null;
@@ -240,6 +244,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       attached: function() {
 
       },
+      clear: function() {
+        this.setProperties({
+            'lastName': '',
+            'firstName': '',
+            'birthdate': '',
+            'phoneMobile': '',
+            'phoneHome': '',
+            'phoneWork': '',
+            'email': '',
+            'languageId': -1
+          });
+      },
       save: function() {
         // Check if the birthdate is valid first.
         // It can be empty I guess.
@@ -249,16 +265,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (this.loading) return;
         var reg = /(\d{1,2})\/(\d{1,2})\/(\d{4})/;
         var bDate;
-        if (this.birthdate.indexOf('-') > 0) {
+        if (this.birthdate && this.birthdate.indexOf('-') > 0) {
           console.log('Found a date with dashes in it.');
           bDate = new Date(this.birthdate);
         } else {
           var matches = reg.exec(this.birthdate);
-          if (matches.length === 4) {
-            bDate = new Date(matches[3], Number(matches[2])-1, matches[1]);
+          if (matches !== null && matches.length === 4) {
+            bDate = new Date(Number(matches[3]), Number(matches[2]) - 1, Number(matches[1]));
           }
         }
-        if (!bDate || isNaN(bDate.getTime())) {
+        if (bDate && isNaN(bDate.getTime())) {
           this.warningMessage = 'Invalid birth date, please leave empty '
             + 'or use format dd/mm/yyyy.';
             return;
@@ -269,17 +285,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           'Authorization': 'bearer ' + this.creds.token
         };
         this.$.personRequester.contentType = 'application/json';
-        var month = bDate.getMonth() - 1;
+        var bDateStr = bDate ? bDate.getFullYear() + '-' + (bDate.getMonth() + 1) 
+          + '-' + bDate.getDate() : '';
+        console.log('Will be using date string: ' + bDateStr);
         var body = {
           'firstname': this.firstName,
           'lastname': this.lastName,
-          'birthdate': bDate.getFullYear() + '-' + month 
-            + '-' + bDate.getDay(),
+          'birthdate': bDateStr,
           'phoneMobile': this.phoneMobile,
           'phoneWork': this.phoneWork,
           'phoneHome': this.phoneHome,
           'email': this.email,
-          'languageId': this.languageId
+          'languageId': this.languageId + 1
         };
         if (this.personId > 0) {
           body.personId = this.personId;
@@ -343,7 +360,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             'phoneHome': e.detail.response.phoneHome,
             'phoneWork': e.detail.response.phoneWork,
             'email': e.detail.response.email,
-            'languageId': e.detail.response.languageId
+            'languageId': Number(e.detail.response.languageId) - 1
           });
           return;
         }
@@ -358,6 +375,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           ));
         }
         this.warningMessage = '';
+      },
+      _getLanguageString: function() {
+        switch(this.languageId) {
+          case -1:
+            return '';
+            break;
+          case 1:
+            return 'fr';
+            break;
+          case 2:
+            return 'nl';
+            break;
+          case 3:
+            return 'en';
+            break;
+          default:
+            return 'fr';
+        }
       }
 
     });

@@ -40,6 +40,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         text-align: right;
         font-weight: bolder;
       }
+      .controls {
+        border-top: 1px solid silver;
+        padding-top: 4px;
+      }
       /*.dialog {
         overflow: auto;
       }*/
@@ -48,6 +52,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         right: 6px;
         bottom: 6px;
       }*/
+      paper-fab {
+        float: left;
+      }
     </style>
 
     <paper-dialog id="personDetails">
@@ -56,18 +63,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           edit-mode="{{personEditMode}}" 
           person-id="{{personId}}"
           creds="{{creds}}"
-          on-created-or-modified="personOperationCompleted">
+          on-created-or-modified="_personOperationCompleted">
         </person-details>
       </paper-dialog-scrollable>
-      <hr width="100%" />
       <template is="dom-if" if="{{personEditMode}}">
-        <div class="layout horizontal end-justified" style="margin-top: 0">
+        <div class="layout horizontal end-justified controls" style="margin-top: 0">
           <paper-icon-button icon="save" title="Save" on-tap="savePersonDetails"></paper-icon-button>
           <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
         </div>
       </template>
       <template is="dom-if" if="{{!personEditMode}}">
-        <div class="layout horizontal end-justified" style="margin-top: 0">
+        <div class="layout horizontal end-justified controls" style="margin-top: 0">
           <paper-icon-button icon="image:edit" title="Edit" on-tap="editPersonDetails"></paper-icon-button>
           <paper-icon-button icon="cancel" title="Cancel" on-tap="cancelPersonDetails"></paper-icon-button>
         </div>
@@ -275,12 +281,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return date.format('HH:mm');
       },
       clear: function() {
+        // Could use this.setProperties here.
         this.modified = false;
         this.newAppointment = false;
-        this.personId = 0;
+        this.personId = -1;
         this.displayedName = '';
+        this.email = '';
+        this.phoneMobile = '';
+        this.reminderEmail = false;
+        this.reminderSms = false;
       },
-      personOperationCompleted: function(e) {
+      _personOperationCompleted: function(e) {
         this.$.personDetails.close();
         this.displayedName = e.detail.lastname + ' ' +
           e.detail.firstname;
