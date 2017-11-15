@@ -513,7 +513,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _queryfn: function(datasource, query) {
         return datasource.filter(function (item) {
           return (
-            item.lastname.toLowerCase().indexOf(query) != -1 || item.lastname.toLowerCase().indexOf(query) != -1
+            item.lastname.toLowerCase().indexOf(query.toLowerCase()) != -1
           );
         });
       },

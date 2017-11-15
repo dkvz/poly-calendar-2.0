@@ -45,7 +45,8 @@ text-color="#ecf0f1"
     <calendar-appointment id="appoint"
       creds="{{creds}}"
       baseApiUrl="[[baseApiUrl]]"
-      data="{{events}}">
+      data="{{events}}"
+      syncing="{{syncing}}">
     </calendar-appointment>
     <!-- The scheduler-component doesn't support direct bindings very well, so
     I'm doing it in JS. -->
@@ -133,6 +134,7 @@ text-color="#ecf0f1"
 
       showEvent(e) {
         // We could use binding for all this.
+        // Or setProperties if it's public.
         this.$.appoint.start = e.detail.calEvent.start.clone();
         this.$.appoint.end = e.detail.calEvent.end.clone();
         this.$.appoint.displayedName = e.detail.calEvent.displayedName;

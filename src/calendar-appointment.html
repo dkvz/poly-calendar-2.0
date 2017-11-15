@@ -53,7 +53,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         bottom: 6px;
       }*/
       paper-fab {
-        float: left;
+        float: right;
       }
     </style>
 
@@ -134,7 +134,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       new-appointment="{{newAppointment}}"
       person-id="{{personId}}"
       creds="{{creds}}"
-      base-api-url="[[baseApiUrl]]">
+      base-api-url="[[baseApiUrl]]"
+      syncing="{{syncing}}">
     </appointment-edit-dialog>
 
   </template>
@@ -237,6 +238,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         baseApiUrl: {
           type: String,
           value: 'http://api.croutte.net/v1/'
+        },
+        syncing: {
+          type: Boolean,
+          notify: true,
+          value: false
         }
 
       },
@@ -290,6 +296,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.phoneMobile = '';
         this.reminderEmail = false;
         this.reminderSms = false;
+        this.location = '';
       },
       _personOperationCompleted: function(e) {
         this.$.personDetails.close();

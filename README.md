@@ -1,6 +1,8 @@
 # Polymer Appointment frontend App
 
 ## WARNING
+**THIS PROJECT HAS BEEN MOVED TO A PRIVATE REPO**
+
 This uses a custom component called "scheduler-component", which is in the bower.json dependencies as well so that it loads its own dependencies.
 
 But what we actually use is in src/scheduler-component. This is a git submodule. You have to go to that directory and load the module. Check if there are files in there.
